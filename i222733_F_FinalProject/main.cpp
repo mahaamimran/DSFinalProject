@@ -1,83 +1,77 @@
-
 #include <iostream>
-#include "Header.h"
 #include <list>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
+
 using namespace std;
 
-struct Node{
-    int data;
-    Node*next;
-};
-class Graph{
+class Graph {
     int V;
-    list<int>*adjList;
+    list<int>* adjList;
+
 public:
-    Graph(int v):V(v){
+    Graph(int v) : V(v) {
         adjList = new list<int>[V];
     }
-    void addEdge(int u, int v){
+    int getV() {
+        return V;
+    }
+    void setV(int v) {
+        V = v;
+    }
+    void addEdge(int u, int v) {
         adjList[u].push_back(v);
         adjList[v].push_back(u);
     }
-    // display like 2D array
-    void display(){
-        for(int i=0;i<V;i++){
-            cout<<i<<"=>";
-            for(int x:adjList[i]){
-                cout<<x<<",";
-            }
-            cout<<endl;
-        }
-    }
-       void displayAsGraphMatrix() {
-        // Create a 2D array for the adjacency matrix
-        int** matrix = new int*[V];
-        for (int i = 0; i < V; i++) {
-            matrix[i] = new int[V];
-            for (int j = 0; j < V; j++) {
-                matrix[i][j] = 0; // Initialize all elements to 0
-            }
-        }
 
-        // Fill the adjacency matrix
+    void display() {
         for (int i = 0; i < V; i++) {
+            cout << i << "=>";
             for (int x : adjList[i]) {
-                matrix[i][x] = 1; // Set matrix[i][x] to 1 if there is an edge between i and x
-            }
-        }
-
-        // Display the adjacency matrix
-        for (int i = 0; i < V; i++) {
-            for (int j = 0; j < V; j++) {
-                cout << matrix[i][j] << " ";
+                cout << x << ",";
             }
             cout << endl;
         }
-
-        // Deallocate memory
-        for (int i = 0; i < V; i++) {
-            delete[] matrix[i];
-        }
-        delete[] matrix;
     }
+    void display2() {
+    for (int i = 0; i < V; i++) {
+        cout << string(adjList[i].size() + 1, '-'); // Display dashes based on the number of adjacent vertices
+        if (!adjList[i].empty()) {
+            cout << "|" << endl; // Display a vertical bar if there are adjacent vertices
+        }
+    }
+}
+
     ~Graph() {
         delete[] adjList;
     }
-
-
 };
 
+void generateMap(Graph& g) {
+    // Add edges to create the road-like pattern
+    g.addEdge(0, 1);
+    g.addEdge(1, 2);
+}
+
+void startGame(Graph& g) {
+    // The game logic goes here
+    generateMap(g);
+    g.display2();
+
+    // Additional game implementation...
+}
+
 int main() {
-    Graph g(5); 
+    Graph g(5);
     g.addEdge(0, 1);
     g.addEdge(0, 4);
     g.addEdge(1, 2);
     g.addEdge(1, 3);
     g.addEdge(2, 3);
     g.addEdge(3, 4);
-    g.display();
-    g.displayAsGraphMatrix();
-    
+
+    startGame(g);
 
     return 0;
 }
