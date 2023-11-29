@@ -8,50 +8,65 @@ using namespace std;
 
 class Graph {
     int V;
-    list<int>* adjList;
+    list<int>*adjList;
 
 public:
     Graph(int v) : V(v) {
         adjList = new list<int>[V];
     }
+
     int getV() {
         return V;
     }
+
     void setV(int v) {
         V = v;
     }
+
     void addEdge(int u, int v) {
         adjList[u].push_back(v);
         adjList[v].push_back(u);
     }
 
-    void display() {
-        for (int i = 0; i < V; i++) {
-            cout << i << "=>";
-            for (int x : adjList[i]) {
-                cout << x << ",";
-            }
-            cout << endl;
-        }
-    }
     void display2() {
-    for (int i = 0; i < V; i++) {
-        cout << string(adjList[i].size() + 1, '-'); // Display dashes based on the number of adjacent vertices
-        if (!adjList[i].empty()) {
-            cout << "|" << endl; // Display a vertical bar if there are adjacent vertices
-        }
+        // 0 1 2
+        // 3 4 5
+        // 6 7 8
+        // each node is represented by a 'x'
+        // each edge is represented by a '-' or '|'
+        // each corner is represented by a '+'
+        // each empty space is represented by a ' '
+        // displaying this 
+        // +-+-+
+        // | | |
+        // +-+-+
+        // | | |
+        // +-+-+
+        
     }
-}
 
     ~Graph() {
         delete[] adjList;
     }
 };
 
-void generateMap(Graph& g) {
-    // Add edges to create the road-like pattern
-    g.addEdge(0, 1);
-    g.addEdge(1, 2);
+void generateMap(Graph& g) {    
+    // creating a graph with 9 vertices (3*3)
+    // 0 1 2
+    // 3 4 5
+    // 6 7 8
+    g.addEdge(0,1);
+    g.addEdge(0,3);
+    g.addEdge(1,2);
+    g.addEdge(1,4);
+    g.addEdge(2,5);
+    g.addEdge(3,4);
+    g.addEdge(4,5);
+    g.addEdge(3,6);
+    g.addEdge(4,7);
+    g.addEdge(6,7);
+    g.addEdge(5,8);
+    g.addEdge(7,8);
 }
 
 void startGame(Graph& g) {
@@ -63,14 +78,7 @@ void startGame(Graph& g) {
 }
 
 int main() {
-    Graph g(5);
-    g.addEdge(0, 1);
-    g.addEdge(0, 4);
-    g.addEdge(1, 2);
-    g.addEdge(1, 3);
-    g.addEdge(2, 3);
-    g.addEdge(3, 4);
-
+    Graph g(9);
     startGame(g);
 
     return 0;
