@@ -7,11 +7,14 @@
 #include <vector>
 #include <cstdlib>
 #include <ctime>
-
+#include <vector>
+#include <algorithm>
+#include <random>
+#include <chrono>
 using namespace std;
 class Graph {
     int V;
-    list<pair<int, int> >*adjList; 
+    list<pair<int, int> >*adjList;
 public:
     Graph():V(0),adjList(nullptr){}
     Graph(int v):V(v){
@@ -47,7 +50,7 @@ public:
     // Check if edge exists between two nodes
     // If yes, print '-' or '|'
     // Else print ' '
-    // Print edge based on weight, e.g., weight 1 = '-', weight 2 = '--', weight 3 = '---' 
+    // Print edge based on weight, e.g., weight 1 = '-', weight 2 = '--', weight 3 = '---'
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
                 int u=i*columns+j;
@@ -56,13 +59,13 @@ public:
                 else cout << "x";
                 if (j != columns - 1) {
                     if (doesEdgeExist(u, v)) {
-                        for (int k = 0; k < getWeight(i * columns + j, v); k++) {
-                            cout << "-";
-                        }
+                        //for (int k = 0; k < getWeight(i * columns + j, v); k++) {
+                            cout << "--";
+                        //}
                     } else {
-                        for (int k = 0; k < getWeight(i * columns + j, v); k++) {
-                            cout << " ";
-                        }
+                        //for (int k = 0; k < getWeight(i * columns + j, v); k++) {
+                            cout << "  ";
+                        //}
                     }
                 }
             }
@@ -77,73 +80,141 @@ public:
                     // }
                     } else {
                         // for (int k = 0; k < getWeight(u, v); k++) {
-                            //cout << " ";
+                            cout << " ";
                     // }
                     }
                     if (j != columns - 1) {
-                        for (int k = 0; k < getWeight(u, i * columns + j + 1); k++) {
-                            cout << " ";
-                        }
+                        //for (int k = 0; k < getWeight(u, i * columns + j + 1); k++) {
+                            cout << "  ";
+                        //}
                     }
                 }
             }
             cout << endl;
         }
     }
+    void clear() {
+        for (int i = 0; i < V; i++) {
+            adjList[i].clear();
+        }
+    }
+    std::vector<int> findPath(int source, int destination) {
+        std::vector<int> path;
+
+        // Create a queue for BFS
+        std::queue<int> queue;
+
+        // Create a vector to store the parent of each vertex
+        std::vector<int> parent(V, -1);
+
+        // Create a vector to store whether a vertex has been visited or not
+        std::vector<bool> visited(V, false);
+
+        // Mark the source vertex as visited and enqueue it
+        visited[source] = true;
+        queue.push(source);
+
+        // Run BFS until the queue is empty
+        while (!queue.empty()) {
+            // Dequeue a vertex from the queue
+            int vertex = queue.front();
+            queue.pop();
+
+            // Get all adjacent vertices of the dequeued vertex vertex
+            for (auto neighbor : adjList[vertex]) {
+                // If a adjacent has not been visited, then mark it visited and enqueue it
+                if (!visited[neighbor.first]) {
+                    visited[neighbor.first] = true;
+                    queue.push(neighbor.first);
+                    parent[neighbor.first] = vertex;
+                }
+            }
+        }
+
+        // Check if there is a path from the source to the destination
+        if (visited[destination]) {
+            // Traverse the path and store it in the vector 'path'
+            int vertex = destination;
+            while (vertex != -1) {
+                path.push_back(vertex);
+                vertex = parent[vertex];
+            }
+
+            // Reverse the path vector
+            std::reverse(path.begin(), path.end());
+        }
+
+        return path;
+    }
     ~Graph() {
         delete[] adjList;
     }
 };
 
-void generateMap(Graph& g) {    
-    // creating a graph with 25 vertices (5*5)
-    // 0  1  2  3  4
-    // 5  6  7  8  9
-    // 10 11 12 13 14
-    // 15 16 17 18 19
-    // 20 21 22 23 24
-    g.addEdge(0, 1, 2);
-    g.addEdge(0, 5, 2);
-    g.addEdge(1, 2, 2);
-    g.addEdge(1, 6, 2);
-    g.addEdge(2, 3, 2);
-    g.addEdge(2, 7, 2);
-    g.addEdge(3, 4, 2);
-    g.addEdge(3, 8, 2);
-    g.addEdge(4, 9, 2);
-    g.addEdge(5, 6, 2);
-    g.addEdge(5, 10, 2);
-    g.addEdge(6, 7, 2);
-    g.addEdge(6, 11, 2);
-    g.addEdge(7, 8, 2);
-    g.addEdge(7, 12, 2);
-    g.addEdge(8, 9, 2);
-    g.addEdge(8, 13, 2);
-    g.addEdge(9, 14, 2);
-    g.addEdge(10, 11, 2);
-    g.addEdge(10, 15, 2);
-    g.addEdge(11, 12, 2);
-    g.addEdge(11, 16, 2);
-    g.addEdge(12, 13, 2);
-    g.addEdge(12, 17, 2);
-    g.addEdge(13, 14, 2);
-    g.addEdge(13, 18, 2);
-    g.addEdge(14, 19, 2);
-    g.addEdge(15, 16, 2);
-    g.addEdge(15, 20, 2);
-    g.addEdge(16, 17, 2);
-    g.addEdge(16, 21, 2);
-    g.addEdge(17, 18, 2);
-    g.addEdge(17, 22, 2);
-    g.addEdge(18, 19, 2);
-    g.addEdge(18, 23, 2);
-    g.addEdge(19, 24, 2);
-    g.addEdge(20, 21, 2);
-    g.addEdge(21, 22, 2);
-    g.addEdge(22, 23, 2);
-    g.addEdge(23, 24, 2);
-  
-}
 
+
+
+void generateMap(Graph& g) {
+    // Set the seed for the random number generator
+    srand(int(time(0)));
+
+    int rows = 5;
+    int columns = 5;
+    int totalVertices = rows * columns;
+
+    bool pathFound = false;
+
+    while (!pathFound) {
+        g.clear(); // Clear the graph
+
+        // Create a graph with 'totalVertices' vertices
+        for (int i = 0; i < totalVertices; i++) {
+            int vertex = i;
+
+            std::vector<int> neighbors;
+
+            // Check if there is a neighbor to the left
+            if (vertex % columns != 0) {
+                int leftNeighbor = vertex - 1;
+                neighbors.push_back(leftNeighbor);
+            }
+
+            // Check if there is a neighbor to the right
+            if (vertex % columns != columns - 1) {
+                int rightNeighbor = vertex + 1;
+                neighbors.push_back(rightNeighbor);
+            }
+
+            // Check if there is a neighbor above
+            if (vertex >= columns) {
+                int topNeighbor = vertex - columns;
+                neighbors.push_back(topNeighbor);
+            }
+
+            // Check if there is a neighbor below
+            if (vertex < totalVertices - columns) {
+                int bottomNeighbor = vertex + columns;
+                neighbors.push_back(bottomNeighbor);
+            }
+
+            // Randomly shuffle the neighbors vector
+            std::random_shuffle(neighbors.begin(), neighbors.end());
+
+            // Select a random number of neighbors to connect
+            int numPaths = std::rand() % (neighbors.size() + 1);
+            for (int j = 0; j < numPaths; j++) {
+                int neighbor = neighbors[j];
+                int weight = 2; // Set a fixed weight for the path
+                g.addEdge(vertex, neighbor, weight);
+            }
+        }
+
+        // Check if there is a path from the top left corner to the bottom right corner
+        std::vector<int> path = g.findPath(0, totalVertices - 1);
+        if (!path.empty()) {
+            pathFound = true;
+        }
+    }
+}
 
 #endif /* Header_h */
