@@ -71,11 +71,12 @@ public:
 };
 int main() {
     Car car;
-    Graph g(25);
-    generateMap(g);
-    // when a,w,s,d is pressed, the car moves in that direction
+    int rows=6,columns=8;
+    // if row 
+    int vertices = rows*columns;
+    Graph g(vertices);
+    generateMap(g,rows,columns);
     char c;
-    int rows=5, columns=5;
     int carPlace = 0;
     g.display(rows,columns,carPlace);
     cout<<"Press a,w,s,d to move the car\nPress q to quit"<<endl;

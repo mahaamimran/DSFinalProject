@@ -8,9 +8,8 @@
 #include <cstdlib>
 #include <ctime>
 #include <vector>
-#include <algorithm>
+//#include <algorithm>
 #include <random>
-#include <chrono>
 using namespace std;
 class Graph {
     int V;
@@ -98,17 +97,17 @@ public:
             adjList[i].clear();
         }
     }
-    std::vector<int> findPath(int source, int destination) {
-        std::vector<int> path;
+    vector<int> findPath(int source, int destination) {
+        vector<int> path;
 
         // Create a queue for BFS
-        std::queue<int> queue;
+        queue<int> queue;
 
         // Create a vector to store the parent of each vertex
-        std::vector<int> parent(V, -1);
+        vector<int> parent(V, -1);
 
         // Create a vector to store whether a vertex has been visited or not
-        std::vector<bool> visited(V, false);
+        vector<bool> visited(V, false);
 
         // Mark the source vertex as visited and enqueue it
         visited[source] = true;
@@ -141,7 +140,7 @@ public:
             }
 
             // Reverse the path vector
-            std::reverse(path.begin(), path.end());
+            reverse(path.begin(), path.end());
         }
 
         return path;
@@ -150,16 +149,9 @@ public:
         delete[] adjList;
     }
 };
-
-
-
-
-void generateMap(Graph& g) {
+void generateMap(Graph& g, int rows, int columns) {
     // Set the seed for the random number generator
     srand(int(time(0)));
-
-    int rows = 5;
-    int columns = 5;
     int totalVertices = rows * columns;
 
     bool pathFound = false;
@@ -171,7 +163,7 @@ void generateMap(Graph& g) {
         for (int i = 0; i < totalVertices; i++) {
             int vertex = i;
 
-            std::vector<int> neighbors;
+            vector<int> neighbors;
 
             // Check if there is a neighbor to the left
             if (vertex % columns != 0) {
@@ -198,10 +190,15 @@ void generateMap(Graph& g) {
             }
 
             // Randomly shuffle the neighbors vector
-            std::random_shuffle(neighbors.begin(), neighbors.end());
+            // for xcode
+            random_device rd;
+            mt19937 gr(rd());
+            shuffle(neighbors.begin(), neighbors.end(), gr);
+            // random_shuffle(neighbors.begin(), neighbors.end());
+
 
             // Select a random number of neighbors to connect
-            int numPaths = std::rand() % (neighbors.size() + 1);
+            int numPaths = rand() % (neighbors.size() + 1);
             for (int j = 0; j < numPaths; j++) {
                 int neighbor = neighbors[j];
                 int weight = 2; // Set a fixed weight for the path
@@ -210,7 +207,7 @@ void generateMap(Graph& g) {
         }
 
         // Check if there is a path from the top left corner to the bottom right corner
-        std::vector<int> path = g.findPath(0, totalVertices - 1);
+        vector<int> path = g.findPath(0, totalVertices - 1);
         if (!path.empty()) {
             pathFound = true;
         }
