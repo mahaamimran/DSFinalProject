@@ -43,49 +43,80 @@ public:
         }
         return 0;
     }
-    void display(int rows, int columns,int carPlace=0) {
-    // Each node is represented by a 'x'
-    // Each edge is represented by a '-' or '|'
-    // Check if edge exists between two nodes
-    // If yes, print '-' or '|'
-    // Else print ' '
-    // Print edge based on weight, e.g., weight 1 = '-', weight 2 = '--', weight 3 = '---'
+
+    vector<int>dijkstrasAlgorithm(int source,int destination){
+       std::vector<int> dist(V, INT_MAX); // Initialize distances to infinity
+        std::vector<int> parent(V, -1); // Initialize parent pointers
+        std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int> >, std::greater<std::pair<int, int> > > pq;
+
+        dist[source] = 0; // Distance from source to source is 0
+        pq.push(std::make_pair(0, source));
+
+        while (!pq.empty()) {
+            int u = pq.top().second;
+            pq.pop();
+
+            for (auto neighbor : adjList[u]) {
+                int v = neighbor.first;
+                int weight = neighbor.second;
+
+                if (dist[u] + weight < dist[v]) {
+                    dist[v] = dist[u] + weight;
+                    parent[v] = u;
+                    pq.push(std::make_pair(dist[v], v));
+                }
+            }
+        }
+
+        // Reconstruct the path from source to destination
+        std::vector<int> path;
+        int vertex = destination;
+        while (vertex != -1) {
+            path.push_back(vertex);
+            vertex = parent[vertex];
+        }
+        std::reverse(path.begin(), path.end());
+
+        return path;
+    }
+
+    void display(int rows, int columns, int carPlace = 0) {
+        // Each node is represented by a 'x'
+        // Each edge is represented by a '-' or '|'
+        // Check if edge exists between two nodes
+        // If yes, print '-' or '|'
+        // Else print ' '
+        // Print edge based on weight, e.g., weight 1 = '-', weight 2 = '--', weight 3 = '---'
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                int u=i*columns+j;
-                int v=i*columns+j+1;
-                if(i*columns+j==carPlace)cout<<"C";
-                else cout << "x";
+                int u = i * columns + j;
+                int v = i * columns + j + 1;
+                // what to output on place of vertex
+                if (u == carPlace) {
+                    cout << "C";
+                } else {
+                    cout << "x";
+                }
                 if (j != columns - 1) {
                     if (doesEdgeExist(u, v)) {
-                        //for (int k = 0; k < getWeight(i * columns + j, v); k++) {
-                            cout << "--";
-                        //}
+                        cout << "--";
                     } else {
-                        //for (int k = 0; k < getWeight(i * columns + j, v); k++) {
-                            cout << "  ";
-                        //}
+                        cout << "  ";
                     }
                 }
             }
             cout << endl;
             if (i != rows - 1) {
                 for (int j = 0; j < columns; j++) {
-                    int u=i*columns+j;
-                    int v=(i+1)*columns+j;
+                    int u = i * columns + j;
+                    int v = (i + 1) * columns + j;
                     if (doesEdgeExist(u, v)) {
-                        //for (int k = 0; k < getWeight(u, v); k++) {
-                            cout << "|";
-                    // }
+                        cout << "|";
                     } else {
-                        // for (int k = 0; k < getWeight(u, v); k++) {
-                            cout << " ";
-                    // }
+                        cout << " ";
                     }
                     if (j != columns - 1) {
-                        //for (int k = 0; k < getWeight(u, i * columns + j + 1); k++) {
-                            cout << "  ";
-                        //}
+                        cout << "  ";
                     }
                 }
             }
@@ -129,7 +160,6 @@ public:
                 }
             }
         }
-
         // Check if there is a path from the source to the destination
         if (visited[destination]) {
             // Traverse the path and store it in the vector 'path'
@@ -150,53 +180,41 @@ public:
     }
 };
 void generateMap(Graph& g, int rows, int columns) {
-    // Set the seed for the random number generator
     srand(int(time(0)));
     int totalVertices = rows * columns;
-
     bool pathFound = false;
-
     while (!pathFound) {
-        g.clear(); // Clear the graph
-
+        g.clear(); 
         // Create a graph with 'totalVertices' vertices
         for (int i = 0; i < totalVertices; i++) {
             int vertex = i;
-
-            vector<int> neighbors;
-
+            vector<int>neighbors;
             // Check if there is a neighbor to the left
             if (vertex % columns != 0) {
                 int leftNeighbor = vertex - 1;
                 neighbors.push_back(leftNeighbor);
             }
-
             // Check if there is a neighbor to the right
             if (vertex % columns != columns - 1) {
                 int rightNeighbor = vertex + 1;
                 neighbors.push_back(rightNeighbor);
             }
-
             // Check if there is a neighbor above
             if (vertex >= columns) {
                 int topNeighbor = vertex - columns;
                 neighbors.push_back(topNeighbor);
             }
-
             // Check if there is a neighbor below
             if (vertex < totalVertices - columns) {
                 int bottomNeighbor = vertex + columns;
                 neighbors.push_back(bottomNeighbor);
             }
-
             // Randomly shuffle the neighbors vector
             // for xcode
             random_device rd;
             mt19937 gr(rd());
             shuffle(neighbors.begin(), neighbors.end(), gr);
             // random_shuffle(neighbors.begin(), neighbors.end());
-
-
             // Select a random number of neighbors to connect
             int numPaths = rand() % (neighbors.size() + 1);
             for (int j = 0; j < numPaths; j++) {
@@ -205,7 +223,6 @@ void generateMap(Graph& g, int rows, int columns) {
                 g.addEdge(vertex, neighbor, weight);
             }
         }
-
         // Check if there is a path from the top left corner to the bottom right corner
         vector<int> path = g.findPath(0, totalVertices - 1);
         if (!path.empty()) {
@@ -213,5 +230,4 @@ void generateMap(Graph& g, int rows, int columns) {
         }
     }
 }
-
 #endif /* Header_h */

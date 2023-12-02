@@ -71,12 +71,19 @@ public:
 };
 int main() {
     Car car;
-    int rows=6,columns=8;
-    // if row 
+    int rows=6,columns=6;
     int vertices = rows*columns;
     Graph g(vertices);
     generateMap(g,rows,columns);
     char c;
+     std::vector<int> path = g.dijkstrasAlgorithm(0, vertices - 1);
+
+    std::cout << "Shortest path: ";
+    for (int vertex : path) {
+        std::cout << vertex << " ";
+    }
+    std::cout << std::endl;
+
     int carPlace = 0;
     g.display(rows,columns,carPlace);
     cout<<"Press a,w,s,d to move the car\nPress q to quit"<<endl;
@@ -105,5 +112,6 @@ int main() {
             cout<<"Invalid input"<<endl;
         }
     }
+    
     return 0;
 }
