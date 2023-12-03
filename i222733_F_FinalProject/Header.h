@@ -144,7 +144,8 @@ class Car {
 public:
   Car() : symbol('C'), carPlace(0) {}
   Car(char s, int c) : symbol(s), carPlace(c) {}
-  void setSymbol(char s) { symbol = s; }
+  void setCarSymbol(char s) { symbol = s; }
+  char getCarSymbol() { return symbol; }
   int getCarPlace() { return carPlace; }
   void setCarPlace(int c) { carPlace = c; }
   void moveCar(Graph &g, char direction, int rows, int cols) {
@@ -192,17 +193,30 @@ public:
     }
   }
 };
-void display(Graph &g, int rows, int columns, Car &car) {
+void display(Graph &g, int rows, int columns, Car &car, list<Obstacle> &obstacles, int score) {
   for (int i = 0; i < rows; i++) {
     for (int j = 0; j < columns; j++) {
       int u = i * columns + j;
       int v = i * columns + j + 1;
-      // what to output on place of vertex
+      
+      // Check if the current position is occupied by the car
       if (u == car.getCarPlace()) {
-        cout << "C";
-      } else {
-        cout << "x";
+        cout << car.getCarSymbol();
       }
+      else {
+        bool obstacleFound = false;
+        for (auto obstacle : obstacles) {
+          if (u == obstacle.obstaclePlace) {
+            cout << obstacle.symbol;
+            obstacleFound = true;
+            break;
+          }
+        }
+        if (!obstacleFound) {
+          cout << "x";
+        }
+      }
+
       if (j != columns - 1) {
         if (g.doesEdgeExist(u, v)) {
           cout << "--";
@@ -212,15 +226,18 @@ void display(Graph &g, int rows, int columns, Car &car) {
       }
     }
     cout << endl;
+    
     if (i != rows - 1) {
       for (int j = 0; j < columns; j++) {
         int u = i * columns + j;
         int v = (i + 1) * columns + j;
+        
         if (g.doesEdgeExist(u, v)) {
           cout << "|";
         } else {
           cout << " ";
         }
+        
         if (j != columns - 1) {
           cout << "  ";
         }
@@ -228,6 +245,17 @@ void display(Graph &g, int rows, int columns, Car &car) {
     }
     cout << endl;
   }
+}
+void enqueObstacles(list<Obstacle>&obstacles,int rows,int columns,vector<int>&path,int numofObstacles=4){
+    // this function enques obstacles in the list
+    for(int i=0;i<numofObstacles;i++){
+       // place obstacles in in path
+        int obstaclePlace=path[rand()%path.size()];
+        Obstacle obstacle;
+        obstacle.obstaclePlace=obstaclePlace;
+        obstacle.symbol='O';
+        obstacles.push_back(obstacle);
+    }
 }
 void generateMap(Graph &g, int rows, int columns) {
   // this function generates a random map and adds edges bertween vertices
