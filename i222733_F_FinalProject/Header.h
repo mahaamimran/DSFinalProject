@@ -8,17 +8,18 @@
 #include <cstdlib>
 #include <ctime>
 #include <vector>
-//#include <algorithm>
 #include <random>
 using namespace std;
+struct Obstacle{
+    char symbol;
+    int obstaclePlace;
+};
 class Graph {
     int V;
     list<pair<int, int> >*adjList;
 public:
     Graph():V(0),adjList(nullptr){}
-    Graph(int v):V(v){
-        adjList = new list<pair<int, int> >[V];
-    }
+    Graph(int v):V(v){adjList = new list<pair<int, int> >[V];}
     int getV(){return V;}
     void setV(int v){V = v;}
     list<pair<int, int> >* getAdjList(){return adjList;}
@@ -43,7 +44,6 @@ public:
         }
         return 0;
     }
-
     vector<int>dijkstrasAlgorithm(int source,int destination){
        std::vector<int> dist(V, INT_MAX); // Initialize distances to infinity
         std::vector<int> parent(V, -1); // Initialize parent pointers
@@ -80,49 +80,6 @@ public:
         return path;
     }
 
-    void display(int rows, int columns, int carPlace = 0) {
-        // Each node is represented by a 'x'
-        // Each edge is represented by a '-' or '|'
-        // Check if edge exists between two nodes
-        // If yes, print '-' or '|'
-        // Else print ' '
-        // Print edge based on weight, e.g., weight 1 = '-', weight 2 = '--', weight 3 = '---'
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < columns; j++) {
-                int u = i * columns + j;
-                int v = i * columns + j + 1;
-                // what to output on place of vertex
-                if (u == carPlace) {
-                    cout << "C";
-                } else {
-                    cout << "x";
-                }
-                if (j != columns - 1) {
-                    if (doesEdgeExist(u, v)) {
-                        cout << "--";
-                    } else {
-                        cout << "  ";
-                    }
-                }
-            }
-            cout << endl;
-            if (i != rows - 1) {
-                for (int j = 0; j < columns; j++) {
-                    int u = i * columns + j;
-                    int v = (i + 1) * columns + j;
-                    if (doesEdgeExist(u, v)) {
-                        cout << "|";
-                    } else {
-                        cout << " ";
-                    }
-                    if (j != columns - 1) {
-                        cout << "  ";
-                    }
-                }
-            }
-            cout << endl;
-        }
-    }
     void clear() {
         for (int i = 0; i < V; i++) {
             adjList[i].clear();
@@ -179,7 +136,110 @@ public:
         delete[] adjList;
     }
 };
+class Car{
+    char symbol;
+    int carPlace;
+public:
+    Car():symbol('C'),carPlace(0){}
+    Car(char s,int c):symbol(s),carPlace(c){}
+    void setSymbol(char s){symbol = s;}
+    int getCarPlace(){return carPlace;}
+    void setCarPlace(int c){carPlace = c;}
+    void moveCar(Graph&g, char direction,int rows,int cols) {
+        system("clear");
+        if(direction=='a') {
+            if(carPlace%cols == 0) {
+                cout<<"Can't move left"<<endl;
+            }
+            else {
+                if(g.doesEdgeExist(carPlace, carPlace-1)) {
+                    carPlace--;
+                }
+                else {
+                    cout<<"Can't move left"<<endl;
+                }
+            }
+        }
+        else if(direction == 'w') {
+            if(carPlace-cols < 0) {
+                cout<<"Can't move up"<<endl;
+            }
+            else {
+                if(g.doesEdgeExist(carPlace, carPlace-cols)) {
+                    carPlace-=cols;
+                }
+                else {
+                    cout<<"Can't move up"<<endl;
+                }
+            }
+        }
+        else if(direction == 's') {
+            if(carPlace+cols >= rows*cols) {
+                cout<<"Can't move down"<<endl;
+            }
+            else {
+                if(g.doesEdgeExist(carPlace, carPlace+cols)) {
+                    carPlace+=cols;
+                }
+                else {
+                    cout<<"Can't move down"<<endl;
+                }
+            }
+        }
+        else if(direction == 'd') {
+            if(carPlace%cols == cols-1) {
+                cout<<"Can't move right"<<endl;
+            }
+            else {
+                if(g.doesEdgeExist(carPlace, carPlace+1)) {
+                    carPlace++;
+                }
+                else {
+                    cout<<"Can't move right"<<endl;
+                }
+            }
+        }
+    }
+};
+void display(Graph&g,int rows, int columns,Car&car) {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                int u = i * columns + j;
+                int v = i * columns + j + 1;
+                // what to output on place of vertex
+                if (u == car.getCarPlace()) {
+                    cout << "C";
+                } else {
+                    cout << "x";
+                }
+                if (j != columns - 1) {
+                    if (g.doesEdgeExist(u, v)) {
+                        cout << "--";
+                    } else {
+                        cout << "  ";
+                    }
+                }
+            }
+            cout << endl;
+            if (i != rows - 1) {
+                for (int j = 0; j < columns; j++) {
+                    int u = i * columns + j;
+                    int v = (i + 1) * columns + j;
+                    if (g.doesEdgeExist(u, v)) {
+                        cout << "|";
+                    } else {
+                        cout << " ";
+                    }
+                    if (j != columns - 1) {
+                        cout << "  ";
+                    }
+                }
+            }
+            cout << endl;
+        }
+}
 void generateMap(Graph& g, int rows, int columns) {
+    // this function generates a random map and adds edges bertween vertices
     srand(int(time(0)));
     int totalVertices = rows * columns;
     bool pathFound = false;
