@@ -6,7 +6,6 @@
 #include <cstdlib>
 #include <ctime>
 #include "Header.h"
-
 int main() {
     Car car;
     int rows=6,columns=6;
