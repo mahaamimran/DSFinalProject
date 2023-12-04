@@ -5,8 +5,17 @@
 #include <vector>
 #include <cstdlib>
 #include <ctime>
+#include <fstream>
 #include "Header.h"
 using namespace std;
+void handlingScoreBoard(string name, int score){
+    cout << "Score: " << score << "\n";
+    // write to file
+    ofstream file;
+    file.open("scoreboard.txt", ios::app);
+    file << name << "%" << score << "\n";
+    file.close();
+}
 int main() {
     Car car;
     list<Obstacle>obstacles;
@@ -17,6 +26,7 @@ int main() {
     generateMap(g,rows,columns);
     vector<int>path=g.dijkstrasAlgorithm(0, vertices - 1);
     enqueObstacles(obstacles,rows,columns,path);
+
 
     char c;
     cout << "Shortest path: ";
@@ -32,19 +42,19 @@ int main() {
     while(true) {
         cin>>c;
         if(c == 'a') {
-            car.moveCar(g, 'a',rows,columns);
+            car.moveCar(g, 'a',rows,columns,obstacles, score);
             display(g,rows, columns, car, obstacles, score);
         }
         else if(c == 'w') {
-            car.moveCar(g, 'w',rows,columns);
+            car.moveCar(g, 'w',rows,columns,obstacles, score);
             display(g,rows, columns, car, obstacles, score);
         }
         else if(c == 's') {
-            car.moveCar(g, 's',rows,columns);
+            car.moveCar(g, 's',rows,columns,obstacles, score);
             display(g,rows, columns, car, obstacles, score);
         }
         else if(c == 'd') {
-            car.moveCar(g, 'd',rows,columns);
+            car.moveCar(g, 'd',rows,columns,obstacles, score);
             display(g,rows, columns, car, obstacles, score);
         }
         else if(c == 'q') {
@@ -54,6 +64,5 @@ int main() {
             cout<<"Invalid input"<<endl;
         }
     }
-    
     return 0;
 }

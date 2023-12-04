@@ -148,50 +148,94 @@ public:
   char getCarSymbol() { return symbol; }
   int getCarPlace() { return carPlace; }
   void setCarPlace(int c) { carPlace = c; }
-  void moveCar(Graph &g, char direction, int rows, int cols) {
-    system("clear");
-    if (direction == 'a') {
-      if (carPlace % cols == 0) {
+  void moveCar(Graph &g, char direction, int rows, int cols, list<Obstacle> &obstacles,int score) {
+  system("clear");
+  if (direction == 'a') {
+    if (carPlace % cols == 0) {
+      cout << "Can't move left" << endl;
+    } else {
+      if (g.doesEdgeExist(carPlace, carPlace - 1)) {
+        // Check if the car will collide with an obstacle
+        auto it = obstacles.begin();
+        while (it != obstacles.end()) {
+          if (carPlace - 1 == it->obstaclePlace) {
+            cout << "You hit an obstacle!" << endl;
+            it = obstacles.erase(it); // Remove the obstacle from the list
+            break;
+          } else {
+            ++it;
+          }
+        }
+        carPlace--;
+      } else {
         cout << "Can't move left" << endl;
-      } else {
-        if (g.doesEdgeExist(carPlace, carPlace - 1)) {
-          carPlace--;
-        } else {
-          cout << "Can't move left" << endl;
-        }
       }
-    } else if (direction == 'w') {
-      if (carPlace - cols < 0) {
+    }
+  } else if (direction == 'w') {
+    if (carPlace - cols < 0) {
+      cout << "Can't move up" << endl;
+    } else {
+      if (g.doesEdgeExist(carPlace, carPlace - cols)) {
+        // Check if the car will collide with an obstacle
+        auto it = obstacles.begin();
+        while (it != obstacles.end()) {
+          if (carPlace - cols == it->obstaclePlace) {
+            cout << "You hit an obstacle!" << endl;
+            it = obstacles.erase(it); // Remove the obstacle from the list
+            break;
+          } else {
+            ++it;
+          }
+        }
+        carPlace -= cols;
+      } else {
         cout << "Can't move up" << endl;
-      } else {
-        if (g.doesEdgeExist(carPlace, carPlace - cols)) {
-          carPlace -= cols;
-        } else {
-          cout << "Can't move up" << endl;
-        }
       }
-    } else if (direction == 's') {
-      if (carPlace + cols >= rows * cols) {
+    }
+  } else if (direction == 's') {
+    if (carPlace + cols >= rows * cols) {
+      cout << "Can't move down" << endl;
+    } else {
+      if (g.doesEdgeExist(carPlace, carPlace + cols)) {
+        // Check if the car will collide with an obstacle
+        auto it = obstacles.begin();
+        while (it != obstacles.end()) {
+          if (carPlace + cols == it->obstaclePlace) {
+            cout << "You hit an obstacle!" << endl;
+            it = obstacles.erase(it); // Remove the obstacle from the list
+            break;
+          } else {
+            ++it;
+          }
+        }
+        carPlace += cols;
+      } else {
         cout << "Can't move down" << endl;
-      } else {
-        if (g.doesEdgeExist(carPlace, carPlace + cols)) {
-          carPlace += cols;
-        } else {
-          cout << "Can't move down" << endl;
-        }
       }
-    } else if (direction == 'd') {
-      if (carPlace % cols == cols - 1) {
-        cout << "Can't move right" << endl;
-      } else {
-        if (g.doesEdgeExist(carPlace, carPlace + 1)) {
-          carPlace++;
-        } else {
-          cout << "Can't move right" << endl;
+    }
+  } else if (direction == 'd') {
+    if (carPlace % cols == cols - 1) {
+      cout << "Can't move right" << endl;
+    } else {
+      if (g.doesEdgeExist(carPlace, carPlace + 1)) {
+        // Check if the car will collide with an obstacle
+        auto it = obstacles.begin();
+        while (it != obstacles.end()) {
+          if (carPlace + 1 == it->obstaclePlace) {
+            cout << "You hit an obstacle!" << endl;
+            it = obstacles.erase(it); // Remove the obstacle from the list
+            break;
+          } else {
+            ++it;
+          }
         }
+        carPlace++;
+      } else {
+        cout << "Can't move right" << endl;
       }
     }
   }
+}
 };
 void display(Graph &g, int rows, int columns, Car &car, list<Obstacle> &obstacles, int score) {
   for (int i = 0; i < rows; i++) {
@@ -246,14 +290,21 @@ void display(Graph &g, int rows, int columns, Car &car, list<Obstacle> &obstacle
     cout << endl;
   }
 }
-void enqueObstacles(list<Obstacle>&obstacles,int rows,int columns,vector<int>&path,int numofObstacles=4){
-    // this function enques obstacles in the list
-    for(int i=0;i<numofObstacles;i++){
-       // place obstacles in in path
-        int obstaclePlace=path[rand()%path.size()];
+void enqueObstacles(list<Obstacle>& obstacles, int rows, int columns, vector<int>& path, int numofObstacles = 4) {
+    // Exclude the 0th vertex from the possible obstacle placement
+    vector<int> validPath = path;
+    auto it = find(validPath.begin(), validPath.end(), 0);
+    if (it != validPath.end()) {
+        validPath.erase(it);
+    }
+
+    // Enqueue obstacles in the list
+    for (int i = 0; i < numofObstacles; i++) {
+        // Place obstacles in validPath
+        int obstaclePlace = validPath[rand() % validPath.size()];
         Obstacle obstacle;
-        obstacle.obstaclePlace=obstaclePlace;
-        obstacle.symbol='O';
+        obstacle.obstaclePlace = obstaclePlace;
+        obstacle.symbol = 'O';
         obstacles.push_back(obstacle);
     }
 }
