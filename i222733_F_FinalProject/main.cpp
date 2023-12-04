@@ -19,22 +19,21 @@ void handlingScoreBoard(string name, int score){
 int main() {
     Car car;
     list<Obstacle>obstacles;
+    queue<Obstacle>obstaclesQueue;
+
     int score = 0;
     int rows=6,columns=6;
     int vertices=rows*columns;
     Graph g(vertices);
     generateMap(g,rows,columns);
     vector<int>path=g.dijkstrasAlgorithm(0, vertices - 1);
-    enqueObstacles(obstacles,rows,columns,path);
-
-
+    generateObstacles(obstacles,rows,columns,path);
     char c;
     cout << "Shortest path: ";
     for (int vertex : path) {
         cout << vertex << " ";
     }
     cout << endl;
-
     int carPlace = 0;
     display(g,rows, columns, car, obstacles, score);
     cout<<"Press a,w,s,d to move the car\nPress q to quit"<<endl;
@@ -42,19 +41,19 @@ int main() {
     while(true) {
         cin>>c;
         if(c == 'a') {
-            car.moveCar(g, 'a',rows,columns,obstacles, score);
+            car.moveCar(g, 'a',rows,columns,obstacles, score,obstaclesQueue);
             display(g,rows, columns, car, obstacles, score);
         }
         else if(c == 'w') {
-            car.moveCar(g, 'w',rows,columns,obstacles, score);
+            car.moveCar(g, 'w',rows,columns,obstacles, score,obstaclesQueue);
             display(g,rows, columns, car, obstacles, score);
         }
         else if(c == 's') {
-            car.moveCar(g, 's',rows,columns,obstacles, score);
+            car.moveCar(g, 's',rows,columns,obstacles, score,obstaclesQueue);
             display(g,rows, columns, car, obstacles, score);
         }
         else if(c == 'd') {
-            car.moveCar(g, 'd',rows,columns,obstacles, score);
+            car.moveCar(g, 'd',rows,columns,obstacles, score,obstaclesQueue);
             display(g,rows, columns, car, obstacles, score);
         }
         else if(c == 'q') {

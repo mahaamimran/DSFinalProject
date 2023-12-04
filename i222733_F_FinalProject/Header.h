@@ -9,9 +9,43 @@
 #include <unistd.h>
 #include <vector>
 using namespace std;
+struct Node{
+    int data;
+    Node*next;
+};
+class LinkedList{
+    Node*head;
+    int size;
+public:
+    LinkedList():head(nullptr),size(0){}
+    void insert(int data){
+      if(head==nullptr){
+          head=new Node;
+          head->data=data;
+          head->next=nullptr;
+      }
+      else{
+        Node*newNode=new Node;
+        newNode->data=data;
+        newNode->next=nullptr;
+      }
+    }
+};
 struct Obstacle {
   char symbol;
   int obstaclePlace;
+};
+struct Coins{
+    char symbol;
+    int coinPlace;
+    int scoreValue;
+    int scoleValueBasedOnSymbol(char symbol){
+      if(symbol=='w')scoreValue=10;
+      else if(symbol=='V')scoreValue=20;
+      else if(symbol=='W')scoreValue=30;
+      else scoreValue=0;
+      return scoreValue; 
+    }
 };
 class Graph {
   int V;
@@ -148,7 +182,7 @@ public:
   char getCarSymbol() { return symbol; }
   int getCarPlace() { return carPlace; }
   void setCarPlace(int c) { carPlace = c; }
-  void moveCar(Graph &g, char direction, int rows, int cols, list<Obstacle> &obstacles,int score) {
+  void moveCar(Graph &g, char direction, int rows, int cols, list<Obstacle> &obstacles,int score, queue<Obstacle>&obstaclesQueue) {
   system("clear");
   if (direction == 'a') {
     if (carPlace % cols == 0) {
@@ -160,6 +194,8 @@ public:
         while (it != obstacles.end()) {
           if (carPlace - 1 == it->obstaclePlace) {
             cout << "You hit an obstacle!" << endl;
+            // enqueue the obstacle in a queue of obstacles
+            obstaclesQueue.push(*it);
             it = obstacles.erase(it); // Remove the obstacle from the list
             break;
           } else {
@@ -180,7 +216,9 @@ public:
         auto it = obstacles.begin();
         while (it != obstacles.end()) {
           if (carPlace - cols == it->obstaclePlace) {
-            cout << "You hit an obstacle!" << endl;
+            cout << "You hit an obstacle!\n";
+            // enqueue the obstacle in a queue of obstacles
+
             it = obstacles.erase(it); // Remove the obstacle from the list
             break;
           } else {
@@ -290,7 +328,7 @@ void display(Graph &g, int rows, int columns, Car &car, list<Obstacle> &obstacle
     cout << endl;
   }
 }
-void enqueObstacles(list<Obstacle>& obstacles, int rows, int columns, vector<int>& path, int numofObstacles = 4) {
+void generateObstacles(list<Obstacle>& obstacles, int rows, int columns, vector<int>& path, int numofObstacles = 4) {
     // Exclude the 0th vertex from the possible obstacle placement
     vector<int> validPath = path;
     auto it = find(validPath.begin(), validPath.end(), 0);
