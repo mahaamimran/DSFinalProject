@@ -7,61 +7,86 @@
 #include <ctime>
 #include <fstream>
 #include "Header.h"
+
 using namespace std;
-void handlingScoreBoard(string name, int score){
-    cout << "Score: " << score << "\n";
-    // write to file
-    ofstream file;
-    file.open("scoreboard.txt", ios::app);
-    file << name << "%" << score << "\n";
-    file.close();
+
+void handlingScoreBoard(string name, int score) {
+    // Code for handling the scoreboard
 }
-int main() {
-    Car car;
-    list<Obstacle>obstacles;
-    queue<Obstacle>obstaclesQueue;
-    list<Coins>coins;
-    int score = 0;
-    int rows=6,columns=6;
-    int vertices=rows*columns;
-    Graph g(vertices);
-    generateMap(g,rows,columns);
-    vector<int>path=g.dijkstrasAlgorithm(0, vertices - 1);
-    generateObstacles(obstacles,rows,columns,path);
-    generateCoins(coins,rows,columns,path);
+
+void manualMode(Graph& g, int rows, int columns, Car& car, int& score) {
     char c;
-    cout << "Shortest path: ";
-    for (int vertex : path) {
-        cout << vertex << " ";
-    }
-    cout << endl;
-    int carPlace = 0;
-    display(g,rows, columns, car, obstacles, score,coins);
-    cout<<"Press a,w,s,d to move the car\nPress q to quit"<<endl;
-    while(true) {
-        cin>>c;
-        if(c == 'a') {
-            car.moveCar(g, 'a',rows,columns,obstacles, score,obstaclesQueue);
-            display(g,rows, columns, car, obstacles, score,coins);
+    // displaying map
+    display(g, rows, columns, car, score);
+    cout << "Press a, w, s, d to move the car\nPress q to quit" << endl;
+    while (true) {
+        // moving car
+        cin >> c;
+        if (c == 'a') {
+            // moveCar(Graph &g, char direction, int rows, int cols, list<Obstacle> &obstacles,int score, queue<Obstacle>&obstaclesQueue) {
+            car.moveCar(g, 'a', rows, columns, score);
+            display(g, rows, columns, car, score);
         }
-        else if(c == 'w') {
-            car.moveCar(g, 'w',rows,columns,obstacles, score,obstaclesQueue);
-            display(g,rows, columns, car, obstacles, score,coins);
+        else if (c == 'w') {
+            car.moveCar(g, 'w', rows, columns, score);
+            display(g, rows, columns, car, score);
         }
-        else if(c == 's') {
-            car.moveCar(g, 's',rows,columns,obstacles, score,obstaclesQueue);
-            display(g,rows, columns, car, obstacles, score,coins);
+        else if (c == 's') {
+            car.moveCar(g, 's', rows, columns, score);
+            display(g, rows, columns, car, score);
         }
-        else if(c == 'd') {
-            car.moveCar(g, 'd',rows,columns,obstacles, score,obstaclesQueue);
-            display(g,rows, columns, car, obstacles, score,coins);
+        else if (c == 'd') {
+            car.moveCar(g, 'd', rows, columns, score);
+            display(g, rows, columns, car, score);
         }
-        else if(c == 'q') {
+        else if (c == 'q') {
             break;
         }
         else {
-            cout<<"Invalid input"<<endl;
+            cout << "Invalid input" << endl;
         }
     }
+}
+
+void autoMode(Graph& g, int rows, int columns, Car& car, list<Obstacle>& obstacles, int& score, list<Coins>& coins) {
+    // Code for auto mode
+    cout << "Press q to quit" << endl;
+}
+
+int main() {
+    // declaring variables
+    Car car;
+    list<Obstacle> obstacles;
+    list<Coins> coins;
+    char c;
+    int score = 0;
+    int rows = 6, columns = 6;
+    int vertices = rows * columns;
+    int carPlace = 0;
+    Graph g(vertices);
+
+    // generating map
+    vector<int> path = g.dijkstrasAlgorithm(0, vertices - 1);
+    generateMap(g, rows, columns);
+
+    // generating coins obstacles and powerups
+
+
+    // the game has two modes, manual and auto
+    // ask user to choose mode
+    cout << "Enter your name: ";
+    string name;
+    cin >> name;
+    cout << "Which mode would you like to select?\n1. Manual\n2. Auto\n";
+    int mode;
+    cin >> mode;
+
+    if (mode == 1) {
+        manualMode(g, rows, columns, car, score);
+    }
+    else if (mode == 2) {
+        autoMode(g, rows, columns, car, obstacles, score, coins);
+    }
+
     return 0;
 }
