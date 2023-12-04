@@ -9,26 +9,36 @@
 #include <unistd.h>
 #include <vector>
 using namespace std;
+template<class Type>
 struct Node{
-    int data;
+    Type data;
     Node*next;
 };
+template<class Type>
 class LinkedList{
-    Node*head;
-    int size;
 public:
+    Node<Type>*head;
+    int size;
     LinkedList():head(nullptr),size(0){}
-    void insert(int data){
+    LinkedList(Node<Type>*h,int s):head(h),size(s){}
+    void insert(Type data){
       if(head==nullptr){
-          head=new Node;
+          head=new Node<Type>;
           head->data=data;
           head->next=nullptr;
       }
       else{
-        Node*newNode=new Node;
+        Node<Type>*newNode=new Node<Type>;
         newNode->data=data;
         newNode->next=nullptr;
       }
+    }
+    Node<Type>*getNodeAt(int index){
+      Node<Type>*temp=head;
+      for(int i=0;i<index;i++){
+        temp=temp->next;
+      }
+      return temp;
     }
 };
 struct Obstacle {
@@ -275,27 +285,32 @@ public:
   }
 }
 };
-void display(Graph &g, int rows, int columns, Car &car, list<Obstacle> &obstacles, int score) {
+void display(Graph &g, int rows, int columns, Car &car, list<Obstacle> &obstacles, int score, list<Coins> coins) {
   for (int i = 0; i < rows; i++) {
     for (int j = 0; j < columns; j++) {
       int u = i * columns + j;
       int v = i * columns + j + 1;
-      
+
       // Check if the current position is occupied by the car
       if (u == car.getCarPlace()) {
         cout << car.getCarSymbol();
-      }
-      else {
+      } else {
         bool obstacleFound = false;
-        for (auto obstacle : obstacles) {
-          if (u == obstacle.obstaclePlace) {
-            cout << obstacle.symbol;
-            obstacleFound = true;
-            break;
+        
+        // If no coin at the current position, check for obstacles
+        if (!obstacles.empty()) {
+          for (auto obstacle : obstacles) {
+            if (u == obstacle.obstaclePlace) {
+              cout << obstacle.symbol;
+              obstacleFound = true;
+              break;
+            }
           }
-        }
-        if (!obstacleFound) {
-          cout << "x";
+
+          // If no coin or obstacle, print the track
+          if (!obstacleFound) {
+            cout << "x";
+          }
         }
       }
 
@@ -308,18 +323,18 @@ void display(Graph &g, int rows, int columns, Car &car, list<Obstacle> &obstacle
       }
     }
     cout << endl;
-    
+
     if (i != rows - 1) {
       for (int j = 0; j < columns; j++) {
         int u = i * columns + j;
         int v = (i + 1) * columns + j;
-        
+
         if (g.doesEdgeExist(u, v)) {
           cout << "|";
         } else {
           cout << " ";
         }
-        
+
         if (j != columns - 1) {
           cout << "  ";
         }
@@ -328,6 +343,8 @@ void display(Graph &g, int rows, int columns, Car &car, list<Obstacle> &obstacle
     cout << endl;
   }
 }
+
+
 void generateObstacles(list<Obstacle>& obstacles, int rows, int columns, vector<int>& path, int numofObstacles = 4) {
     // Exclude the 0th vertex from the possible obstacle placement
     vector<int> validPath = path;
@@ -344,6 +361,23 @@ void generateObstacles(list<Obstacle>& obstacles, int rows, int columns, vector<
         obstacle.obstaclePlace = obstaclePlace;
         obstacle.symbol = 'O';
         obstacles.push_back(obstacle);
+    }
+}
+void generateCoins(list<Coins>coins, int rows, int columns, vector<int>& path, int numofCoins = 4) {
+     vector<int> validPath = path;
+    auto it = find(validPath.begin(), validPath.end(), 0);
+    if (it != validPath.end()) {
+        validPath.erase(it);
+    }
+
+    // Enqueue obstacles in the list
+    for (int i = 0; i < numofCoins; i++) {
+        // Place obstacles in validPath
+        int coinPlace = validPath[rand() % validPath.size()];
+        Coins coin;
+        coin.coinPlace = coinPlace;
+        coin.symbol = 'w';
+        coins.push_back(coin);
     }
 }
 void generateMap(Graph &g, int rows, int columns) {
