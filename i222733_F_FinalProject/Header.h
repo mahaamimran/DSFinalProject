@@ -384,8 +384,8 @@ void checkForCollision(Graph &g, int newCarPlace, int &score,
   void checkForLastVertex(Graph &g, int carPlace, int &score) {
     int lastVertex = g.getV() - 1;
     if (carPlace == lastVertex) {
-      cout << "Congratulations! You reached the finish line. Game Over!"
-           << endl;
+      cout << "Congratulations! You reached the finish line. Game Over!\n";
+      cout<<"You scored "<<score<<" points!\n";
     }
   }
   void displaySteps() const {

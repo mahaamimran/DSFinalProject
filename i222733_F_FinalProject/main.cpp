@@ -5,41 +5,37 @@
 #include <iostream>
 #include <list>
 #include <queue>
-#include <unistd.h>
-#include <vector>
 #include <sstream>
 #include <string>
-
+#include <unistd.h>
+#include <vector>
 using namespace std;
-
-void manualMode(Graph& g, int rows, int columns, Car& car, int& score,
-                list<Obstacle>& obstacles, list<Coins>& coins,
-                list<PowerUp>& powerups) {
-    char c;
-    // displaying map
-    display(g, rows, columns, car, coins, obstacles, powerups, score);
-    cout << "Press a, w, s, d to move the car\nPress q to quit" << endl;
-    while (true) {
-        // help for user
-        cout << "Car: C\n";
-        cout << "Powerups: P (20 points)\n";
-        cout << "Coins: 0 (10 points)\n";
-        cout << "Obstacles: B (-10 points)\n";
-        cout << "Get to the end of the map to win! (F)\n";
-        car.displaySteps();
-        cin >> c;
-        if (c == 'a' || c == 'w' || c == 's' || c == 'd') {
-            car.moveCar(g, c, rows, columns, score, obstacles, coins, powerups);
-            display(g, rows, columns, car, coins, obstacles, powerups, score);
-        } else if (c == 'q') {
-            break;
-        } else {
-            cout << "Invalid input" << endl;
-        }
+void manualMode(Graph &g, int rows, int columns, Car &car, int &score,
+                list<Obstacle> &obstacles, list<Coins> &coins,
+                list<PowerUp> &powerups) {
+  char c;
+  // displaying map
+  display(g, rows, columns, car, coins, obstacles, powerups, score);
+  cout << "Press a, w, s, d to move the car\nPress q to quit" << endl;
+  while (true) {
+    // help for user
+    cout << "Car: C\n";
+    cout << "Powerups: P (20 points)\n";
+    cout << "Coins: 0 (10 points)\n";
+    cout << "Obstacles: B (-10 points)\n";
+    cout << "Get to the end of the map to win! (F)\n";
+    car.displaySteps();
+    cin >> c;
+    if (c == 'a' || c == 'w' || c == 's' || c == 'd') {
+      car.moveCar(g, c, rows, columns, score, obstacles, coins, powerups);
+      display(g, rows, columns, car, coins, obstacles, powerups, score);
+    } else if (c == 'q') {
+      break;
+    } else {
+      cout << "Invalid input" << endl;
     }
+  }
 }
-
-
 void autoMode(Graph &g, int rows, int columns, Car &car,
               list<Obstacle> &obstacles, int &score, list<Coins> &coins) {
   // Code for auto mode
@@ -55,30 +51,32 @@ void writeToFile(string name, int score) {
   fout.close();
 }
 
-
 void viewScoreBoard() {
-// Read the scores from the CSV file and insert them into the BST
-    string filePath = "/Users/mahamimran/teesra semester/DS/i222733_F_FinalProject/scoreBoard.csv";
-    ifstream fin(filePath);
-    string line;
-    Node* root = nullptr;
+  // Read the scores from the CSV file and insert them into the BST
+  string filePath = "/Users/mahamimran/teesra "
+                    "semester/DS/i222733_F_FinalProject/scoreBoard.csv";
+  ifstream fin(filePath);
+  string line;
+  Node *root = nullptr;
 
-    while (getline(fin, line)) {
-        // Find the position of the comma to separate name and score
-        size_t pos = line.find(',');
-        if (pos != string::npos) {
-            string name = line.substr(0, pos);
-            string scoreStr = line.substr(pos + 1);
-            int score = stoi(scoreStr);
-            root = insert(root, name, score);
-        }
+  while (getline(fin, line)) {
+    // Find the position of the comma to separate name and score
+    size_t pos = line.find(',');
+    if (pos != string::npos) {
+      string name = line.substr(0, pos);
+      string scoreStr = line.substr(pos + 1);
+      int score = stoi(scoreStr);
+      root = insert(root, name, score);
     }
+  }
 
-    // Display the scores in ascending order
-    cout << "Name "<< "\t" << "Score\n";
-    cout<<"-------------\n";
-    inOrderTraversal(root);
-    fin.close();
+  // Display the scores in ascending order
+  cout << "Name "
+       << "\t"
+       << "Score\n";
+  cout << "-------------\n";
+  inOrderTraversal(root);
+  fin.close();
 }
 void displayAllQueues(list<Obstacle> &obstacles, list<Coins> &coins,
                       list<PowerUp> &powerups) {
@@ -97,14 +95,6 @@ void displayAllQueues(list<Obstacle> &obstacles, list<Coins> &coins,
     cout << it->symbol << " ";
   }
   cout << endl;
-}
-void endGame(const string& name, int score, list<Obstacle>& obstacles, list<Coins>& coins, list<PowerUp>& powerups) {
-    writeToFile(name, score);
-    cout << "Game Over " << name << "! Your score is: " << score << endl;
-    cout << "Everything you bumped into:\n";
-    displayAllQueues(obstacles, coins, powerups);
-    cout << "Here is everyone's score: \n";
-    viewScoreBoard();
 }
 int main() {
   // declaring variables
@@ -142,15 +132,14 @@ int main() {
     manualMode(g, rows, columns, car, score, obstacles, coins, powerups);
     writeToFile(name, score);
   } else if (mode == 2) {
-    cout << "Enter your name: ";
-    string name;
-    cin >> name;
+    system("clear");
+    string name="auto mode";
     autoMode(g, rows, columns, car, obstacles, score, coins);
     writeToFile(name, score);
-    cout << "Game Over "<<name<<"! Your score is: " << score << endl;
-    cout<<"Everything you bumped into:\n";
+    cout << "Game Over " << name << "! Your score is: " << score << endl;
+    cout << "Everything you bumped into:\n";
     displayAllQueues(obstacles, coins, powerups);
-    cout<<"Here is everyone's score: \n";
+    cout << "Here is everyone's score: \n";
     viewScoreBoard();
   } else if (mode == 3) {
     viewScoreBoard();
