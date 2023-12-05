@@ -14,14 +14,29 @@ using namespace std;
 struct Obstacle {
   char symbol;
   int obstaclePlace;
+  // overloading the << operator
+  friend ostream &operator<<(ostream &os, const Obstacle &obstacle) {
+    os << obstacle.symbol;
+    return os;
+  }
 };
 struct Coins {
   char symbol;
   int coinPlace;
+  // overloading the << operator
+  friend ostream &operator<<(ostream &os, const Coins &coin) {
+    os << coin.symbol;
+    return os;
+  }
 };
 struct PowerUp {
   char symbol;
   int powerUpPlace;
+  // overloading the << operator
+  friend ostream &operator<<(ostream &os, const PowerUp &powerUp) {
+    os << powerUp.symbol;
+    return os;
+  }
 };
 
 template <typename Type>
@@ -118,6 +133,14 @@ public:
   }
   bool isEmpty(){
     return size == 0;
+  }
+  void display(){
+    NodeQueue<Type> *temp = front;
+    while(temp != nullptr){
+      cout << temp->data << " ";
+      temp = temp->next;
+    }
+    cout << endl;
   }
   ~Queue(){
     NodeQueue<Type> *temp = front;
@@ -426,20 +449,13 @@ void checkForCollision(Graph &g, int newCarPlace, int &score,
     if (isPlaceTakenByObstacles(newCarPlace, obstacles)) {
         cout << "You hit an obstacle! -10 to score" << endl;
         score -= 10;
-        // remove the obstacle from the list
         for (auto it = obstacles.begin(); it != obstacles.end(); it++) {
             if (it->obstaclePlace == newCarPlace) {
+                // adding it to the queue
+                collectedObstacles.push(*it);
                 obstacles.erase(it);
                 break;
             }
-        }
-        // adding it to the queue
-        for (auto it = obstacles.begin(); it != obstacles.end(); it++) {
-        if (it->obstaclePlace == newCarPlace) {
-          collectedObstacles.push(*it);
-          obstacles.erase(it);
-          break;
-        }
         }
     }
     else if(isPlaceTakenByCoins(newCarPlace, coins)){
@@ -449,48 +465,37 @@ void checkForCollision(Graph &g, int newCarPlace, int &score,
         // remove the coin from the list
         for (auto it = coins.begin(); it != coins.end(); it++) {
             if (it->coinPlace == newCarPlace) {
+                // adding it to the queue
+                collectedCoins.push(*it);
                 coins.erase(it);
                 break;
             }
         }
-        // adding it to the queue
-        for (auto it = obstacles.begin(); it != obstacles.end(); it++) {
-        if (it->obstaclePlace == newCarPlace) {
-          collectedObstacles.push(*it);
-          obstacles.erase(it);
-          break;
-        }
-      }
     }
     else if(isPlaceTakenByPowerUps(newCarPlace, powerUps)){
-        cout << "You collected a power up! +20 to score" << endl;
+      // powerupscorevalue taken from powerups list
+        cout << "You collected a powerup! +20 to score" << endl;
         score += 20;
-        // remove the power up from the list
+        // remove the powerup from the list
         for (auto it = powerUps.begin(); it != powerUps.end(); it++) {
             if (it->powerUpPlace == newCarPlace) {
+                // adding it to the queue
+                collectedPowerUps.push(*it);
                 powerUps.erase(it);
                 break;
             }
         }
-        // adding it to the queue
-        for (auto it = obstacles.begin(); it != obstacles.end(); it++) {
-        if (it->obstaclePlace == newCarPlace) {
-          collectedObstacles.push(*it);
-          obstacles.erase(it);
-          break;
-        }
-        }
     }
-    else{
-        cout << "You moved to a new place" << endl;
+    else {
+        cout << "Race Car Game" << endl;
     }
 }
-
   void checkForLastVertex(Graph &g, int carPlace, int &score) {
     int lastVertex = g.getV() - 1;
     if (carPlace == lastVertex) {
       cout << "Congratulations! You reached the finish line. Game Over!\n";
       cout<<"You scored "<<score<<" points!\n";
+      cout<<"Press q to quit\n";
     }
   }
   void displaySteps() const {

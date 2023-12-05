@@ -110,22 +110,14 @@ void viewScoreBoard() {
   inOrderTraversal(root);
   fin.close();
 }
-void displayAllQueues(list<Obstacle> &obstacles, list<Coins> &coins,
-                      list<PowerUp> &powerups) {
-  cout << "Obstacles: ";
-  for (auto it = obstacles.begin(); it != obstacles.end(); it++) {
-    cout << it->symbol << " ";
-  }
-  cout << endl;
+void displayAllQueues() {
+  // displaying all the queues at the end of the game
   cout << "Coins: ";
-  for (auto it = coins.begin(); it != coins.end(); it++) {
-    cout << it->symbol << " ";
-  }
-  cout << endl;
-  cout << "Powerups: ";
-  for (auto it = powerups.begin(); it != powerups.end(); it++) {
-    cout << it->symbol << " ";
-  }
+  collectedCoins.display();
+  cout << "Obstacles: ";
+  collectedObstacles.display();
+  cout << "PowerUps: ";
+  collectedPowerUps.display();
   cout << endl;
 }
 int main() {
@@ -163,6 +155,9 @@ int main() {
     system("clear");
     manualMode(g, rows, columns, car, score, obstacles, coins, powerups);
     writeToFile(name, score);
+    cout << "Game Over " << name << "! Your score is: " << score << endl;
+    cout << "Everything you bumped into:\n";
+    displayAllQueues();
   } else if (mode == 2) {
     system("clear");
     string name="auto mode";
@@ -170,9 +165,7 @@ int main() {
     writeToFile(name, score);
     cout << "Game Over " << name << "! Your score is: " << score << endl;
     cout << "Everything you bumped into:\n";
-    displayAllQueues(obstacles, coins, powerups);
-    cout << "Here is everyone's score: \n";
-    viewScoreBoard();
+    displayAllQueues();
   } else if (mode == 3) {
     viewScoreBoard();
   } else {
