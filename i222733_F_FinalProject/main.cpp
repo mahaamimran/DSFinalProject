@@ -36,10 +36,42 @@ void manualMode(Graph &g, int rows, int columns, Car &car, int &score,
     }
   }
 }
-void autoMode(Graph &g, int rows, int columns, Car &car,
-              list<Obstacle> &obstacles, int &score, list<Coins> &coins) {
-  // Code for auto mode
-  cout << "Press q to quit" << endl;
+void autoMode(Graph &g, int rows, int columns, Car &car, list<Obstacle> &obstacles, int &score, list<Coins> &coins, list<PowerUp>& powerUps, vector<int> path) {
+ // system("clear");
+  
+  // Iterate through each vertex in the path
+  for (int i = 0; i < path.size() - 1; i++) {
+    // Move the car to the next vertex in the path
+    int currentVertex = path[i];
+    int nextVertex = path[i + 1];
+
+    // Determine the direction of movement
+    char direction;
+    if (nextVertex == currentVertex - 1) {
+      direction = 'a';
+    } else if (nextVertex == currentVertex + 1) {
+      direction = 'd';
+    } else if (nextVertex == currentVertex - columns) {
+      direction = 'w';
+    } else if (nextVertex == currentVertex + columns) {
+      direction = 's';
+    } else {
+      // Invalid path, skip this move
+      continue;
+    }
+
+    // Move the car in the determined direction
+    car.moveCar(g, direction, rows, columns, score, obstacles, coins, powerUps);
+
+    // Update the display to show the current state
+    display(g, rows, columns, car, coins, obstacles, powerUps, score);
+
+    // Introduce a delay of one second to simulate real-time movement
+    sleep(1);
+  }
+
+  // Optional: Display the final score after reaching the destination
+  cout << "Game Over! Your score is: " << score << endl;
 }
 
 void writeToFile(string name, int score) {
@@ -134,7 +166,7 @@ int main() {
   } else if (mode == 2) {
     system("clear");
     string name="auto mode";
-    autoMode(g, rows, columns, car, obstacles, score, coins);
+    autoMode(g,rows,columns,car, obstacles, score, coins, powerups, path);
     writeToFile(name, score);
     cout << "Game Over " << name << "! Your score is: " << score << endl;
     cout << "Everything you bumped into:\n";
