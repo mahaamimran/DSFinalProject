@@ -23,6 +23,9 @@ struct PowerUp {
   char symbol;
   int powerUpPlace;
 };
+queue<Coins> collectedCoins;
+queue<Obstacle> collectedObstacles;
+queue<PowerUp> collectedPowerUps;
 struct Node {
   string name;
   int score;
@@ -217,12 +220,9 @@ public:
   void setStepsTaken(int st) { stepsTaken = st; }
   void checkForItems(Graph &g, int carPlace, list<Obstacle> &obstacles,
                      list<Coins> &coins, list<PowerUp> &powerUps, int &score) {}
-  void moveUp(Graph &g, int rows, int cols, int &score,
-            list<Obstacle> &obstacles, list<Coins> &coins,
-            list<PowerUp> &powerUps) {
+  void moveUp(Graph &g, int rows, int cols, int &score,list<Obstacle> &obstacles, list<Coins> &coins,list<PowerUp> &powerUps) {
     system("clear");
     int newCarPlace = carPlace - cols;
-
     if (newCarPlace < 0) {
         cout << "Can't move up" << endl;
     } else {
@@ -230,15 +230,14 @@ public:
             checkForCollision(g, newCarPlace, score, obstacles, coins, powerUps);
             carPlace = newCarPlace;
             checkForLastVertex(g, carPlace, score);
+            stepsTaken++;
         } else {
             cout << "Can't move up" << endl;
         }
     }
 }
 
-void moveDown(Graph &g, int rows, int cols, int &score,
-              list<Obstacle> &obstacles, list<Coins> &coins,
-              list<PowerUp> &powerUps) {
+void moveDown(Graph &g, int rows, int cols, int &score,list<Obstacle> &obstacles, list<Coins> &coins,list<PowerUp> &powerUps) {
     system("clear");
     int newCarPlace = carPlace + cols;
 
@@ -249,6 +248,7 @@ void moveDown(Graph &g, int rows, int cols, int &score,
             checkForCollision(g, newCarPlace, score, obstacles, coins, powerUps);
             carPlace = newCarPlace;
             checkForLastVertex(g, carPlace, score);
+            stepsTaken++;
         } else {
             cout << "Can't move down" << endl;
         }
@@ -268,6 +268,7 @@ void moveLeft(Graph &g, int rows, int cols, int &score,
             checkForCollision(g, newCarPlace, score, obstacles, coins, powerUps);
             carPlace = newCarPlace;
             checkForLastVertex(g, carPlace, score);
+            stepsTaken++;
         } else {
             cout << "Can't move left" << endl;
         }
@@ -287,6 +288,7 @@ void moveRight(Graph &g, int rows, int cols, int &score,
             checkForCollision(g, newCarPlace, score, obstacles, coins, powerUps);
             carPlace = newCarPlace;
             checkForLastVertex(g, carPlace, score);
+            stepsTaken++;
         } else {
             cout << "Can't move right" << endl;
         }
@@ -312,8 +314,6 @@ void moveCar(Graph &g, char direction, int rows, int cols, int &score,
             cout << "Invalid input" << endl;
     }
 }
-
-
 void checkForCollision(Graph &g, int newCarPlace, int &score,
                        list<Obstacle> &obstacles, list<Coins> &coins,
                        list<PowerUp> &powerUps) {
@@ -321,6 +321,21 @@ void checkForCollision(Graph &g, int newCarPlace, int &score,
     if (isPlaceTakenByObstacles(newCarPlace, obstacles)) {
         cout << "You hit an obstacle! -10 to score" << endl;
         score -= 10;
+        // remove the obstacle from the list
+        for (auto it = obstacles.begin(); it != obstacles.end(); it++) {
+            if (it->obstaclePlace == newCarPlace) {
+                obstacles.erase(it);
+                break;
+            }
+        }
+        // adding it to the queue
+        for (auto it = obstacles.begin(); it != obstacles.end(); it++) {
+        if (it->obstaclePlace == newCarPlace) {
+          collectedObstacles.push(*it);
+          obstacles.erase(it);
+          break;
+        }
+        }
     }
     else if(isPlaceTakenByCoins(newCarPlace, coins)){
       // coinscorevalue taken from coins list
@@ -333,6 +348,14 @@ void checkForCollision(Graph &g, int newCarPlace, int &score,
                 break;
             }
         }
+        // adding it to the queue
+        for (auto it = obstacles.begin(); it != obstacles.end(); it++) {
+        if (it->obstaclePlace == newCarPlace) {
+          collectedObstacles.push(*it);
+          obstacles.erase(it);
+          break;
+        }
+      }
     }
     else if(isPlaceTakenByPowerUps(newCarPlace, powerUps)){
         cout << "You collected a power up! +20 to score" << endl;
@@ -343,6 +366,14 @@ void checkForCollision(Graph &g, int newCarPlace, int &score,
                 powerUps.erase(it);
                 break;
             }
+        }
+        // adding it to the queue
+        for (auto it = obstacles.begin(); it != obstacles.end(); it++) {
+        if (it->obstaclePlace == newCarPlace) {
+          collectedObstacles.push(*it);
+          obstacles.erase(it);
+          break;
+        }
         }
     }
     else{
@@ -355,10 +386,10 @@ void checkForCollision(Graph &g, int newCarPlace, int &score,
     if (carPlace == lastVertex) {
       cout << "Congratulations! You reached the finish line. Game Over!"
            << endl;
-      cout << "Your final score: " << score << endl;
-      // Add any other end-of-game logic as needed
-      exit(0); // Terminate the program
     }
+  }
+  void displaySteps() const {
+    cout << "Number of steps taken: " << stepsTaken << endl;
   }
 };
 void generateItems(Graph& g, int rows, int cols, list<Coins>& coins, list<Obstacle>& obstacles, list<PowerUp>& powerups) {
@@ -385,7 +416,7 @@ void generateItems(Graph& g, int rows, int cols, list<Coins>& coins, list<Obstac
 
     Coins coin;
     coin.coinPlace = loc;
-    
+    coin.symbol = 'O';
     coins.push_back(coin);
   }
 
@@ -400,7 +431,7 @@ void generateItems(Graph& g, int rows, int cols, list<Coins>& coins, list<Obstac
 
     Obstacle obstacle;
     obstacle.obstaclePlace = loc;
-
+    obstacle.symbol = 'B';
     obstacles.push_back(obstacle);
   }
 
@@ -415,6 +446,7 @@ void generateItems(Graph& g, int rows, int cols, list<Coins>& coins, list<Obstac
 
     PowerUp powerup;
     powerup.powerUpPlace = loc;
+    powerup.symbol = 'P';
 
     powerups.push_back(powerup);
   }
@@ -431,12 +463,15 @@ void display(Graph &g, int rows, int columns, Car &car, list<Coins> &coins,
       if (u == car.getCarPlace()) {
         cout << car.getCarSymbol();
       } else if (isPlaceTakenByCoins(u, coins)) {
-        cout << "O";
+        cout << coins.front().symbol;
       } else if (isPlaceTakenByObstacles(u, obstacles)) {
-        cout << "B";
+        cout << obstacles.front().symbol;
       } else if (isPlaceTakenByPowerUps(u, powerUps)) {
-        cout << "P";
-      } else {
+        cout << powerUps.front().symbol;
+      } else if (u == g.getV() - 1) {
+        cout << 'F';
+      }
+      else {
           cout << "x";
         }
       
