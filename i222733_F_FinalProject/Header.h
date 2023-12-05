@@ -204,7 +204,6 @@ public:
       }
     }
   }
-
   void moveDown(Graph &g, int rows, int cols, int &score,
                 list<Obstacle> &obstacles, list<Coins> &coins,
                 list<PowerUp> &powerUps) {
@@ -318,7 +317,7 @@ void generatePowerUps(Graph &g, int rows, int columns,
                       list<PowerUp> &powerups) {
   srand(int(time(0)));
   int totalVertices = rows * columns;
-  int numPowerUps = rand() % (totalVertices / 2);
+  int numPowerUps = 4;
   for (int i = 0; i < numPowerUps; i++) {
     int powerUpPlace = rand() % totalVertices;
     PowerUp powerup;
@@ -371,8 +370,9 @@ void display(Graph &g, int rows, int columns, Car &car, list<Coins> &coins,
       } else if (isPlaceTakenByPowerUps(u, powerUps)) {
         cout << "P";
       } else {
-        cout << "x";
-      }
+          cout << "x";
+        }
+      
 
       if (j != columns - 1) {
         if (g.doesEdgeExist(u, v)) {
@@ -403,6 +403,7 @@ void display(Graph &g, int rows, int columns, Car &car, list<Coins> &coins,
     cout << endl;
   }
 }
+
 void generateMap(Graph &g, int rows, int columns) {
   // this function generates a random map and adds edges bertween vertices
   srand(int(time(0)));
