@@ -8,6 +8,7 @@
 #include <random>
 #include <unistd.h>
 #include <vector>
+
 using namespace std;
 struct Obstacle {
   char symbol;
@@ -22,7 +23,33 @@ struct PowerUp {
   char symbol;
   int powerUpPlace;
 };
+struct Node {
+    string name;
+    int score;
+    Node* left;
+    Node* right;
+    Node(string n, int s) : name(n), score(s), left(nullptr), right(nullptr) {}
+};
+Node* insert(Node* root, string name, int score) {
+    if (root == nullptr) {
+        return new Node(name, score);
+    }
 
+    if (score < root->score) {
+        root->left = insert(root->left, name, score);
+    } else if (score > root->score) {
+        root->right = insert(root->right, name, score);
+    }
+
+    return root;
+}
+void inOrderTraversal(Node* root) {       
+    if (root != nullptr) {
+        inOrderTraversal(root->left);
+        cout << root->name << "\t" << root->score << endl;
+        inOrderTraversal(root->right);
+    }
+}
 class Graph {
   int V;
   list<pair<int, int> > *adjList;
@@ -158,11 +185,10 @@ public:
   char getCarSymbol() { return symbol; }
   int getCarPlace() { return carPlace; }
   void setCarPlace(int c) { carPlace = c; }
-  void checkForItems(Graph &g,int carPlace,list<Obstacle>& obstacles, list<Coins>& coins, int &score) {
+  void checkForItems(Graph &g,int carPlace,list<Obstacle>& obstacles, list<Coins>& coins,list<PowerUp>&powerUps, int &score) {
 
-    // if carplace is  
   }
-  void moveCar(Graph &g, char direction, int rows, int cols, int &score, list<Obstacle>& obstacles, list<Coins>& coins) {
+  void moveCar(Graph &g, char direction, int rows, int cols, int &score, list<Obstacle>& obstacles, list<Coins>& coins,list<PowerUp>&powerUps) {
     system("clear");
     if (direction == 'a') {
       if (carPlace % cols == 0) {
@@ -170,7 +196,7 @@ public:
       } else {
         if (g.doesEdgeExist(carPlace, carPlace - 1)) {
           carPlace--;
-          checkForItems(g,carPlace, obstacles, coins, score);
+          checkForItems(g,carPlace, obstacles, coins,powerUps, score);
         } else {
           cout << "Can't move left" << endl;
         }
@@ -211,7 +237,6 @@ public:
     }
   }
 };
-
 void generateCoins(Graph&g,int rows,int columns,list<Coins>&coins){
   srand(int(time(0)));
   int totalVertices = rows * columns;
