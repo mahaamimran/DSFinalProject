@@ -4,11 +4,11 @@
 #include <ctime>
 #include <iostream>
 #include <list>
-#include <queue>
 #include <random>
 #include <unistd.h>
 #include <vector>
 #include <set>
+#include <queue> // only used in dijkstrasAlgorithm
 
 using namespace std;
 struct Obstacle {
@@ -23,19 +23,121 @@ struct PowerUp {
   char symbol;
   int powerUpPlace;
 };
-queue<Coins> collectedCoins;
-queue<Obstacle> collectedObstacles;
-queue<PowerUp> collectedPowerUps;
-struct Node {
+
+template <typename Type>
+struct NodeLinkedList{
+  Type data;
+  NodeLinkedList *next;
+};
+template <typename Type>
+class LinkedList{
+  NodeLinkedList<Type> *head;
+  int size;
+public:
+  LinkedList():head(nullptr), size(0){}
+  void insert(Type data){
+    NodeLinkedList<Type> *newNode = new NodeLinkedList<Type>;
+    newNode->data = data;
+    newNode->next = nullptr;
+    if(head == nullptr){
+      head = newNode;
+    }
+    else{
+      NodeLinkedList<Type> *temp = head;
+      while(temp->next != nullptr){
+        temp = temp->next;
+      }
+      temp->next = newNode;
+    }
+    size++;
+  }
+  void display(){
+    NodeLinkedList<Type> *temp = head;
+    while(temp != nullptr){
+      cout << temp->data << endl;
+      temp = temp->next;
+    }
+  }
+  int getSize(){
+    return size;
+  }
+  ~LinkedList(){
+    NodeLinkedList<Type> *temp = head;
+    while(temp != nullptr){
+      NodeLinkedList<Type> *next = temp->next;
+      delete temp;
+      temp = next;
+    }
+  }
+};
+template <typename Type>
+struct NodeQueue{
+  Type data;
+  NodeQueue *next;
+};
+template <typename Type>
+class Queue{
+  NodeQueue<Type> *front;
+  NodeQueue<Type> *rear;
+  int size;
+public:
+  Queue():front(nullptr), rear(nullptr), size(0){}
+  void push(Type data){
+    NodeQueue<Type> *newNode = new NodeQueue<Type>;
+    newNode->data = data;
+    newNode->next = nullptr;
+    if(front == nullptr){
+      front = newNode;
+      rear = newNode;
+    }
+    else{
+      rear->next = newNode;
+      rear = newNode;
+    }
+    size++;
+  }
+  void pop(){
+    if(front == nullptr){
+      cout << "Queue is empty" << endl;
+    }
+    else{
+      NodeQueue<Type> *temp = front;
+      front = front->next;
+      delete temp;
+      size--;
+    }
+  }
+  Type getFront(){
+    return front->data;
+  }
+  Type getRear(){
+    return rear->data;
+  }
+  int getSize(){
+    return size;
+  }
+  bool isEmpty(){
+    return size == 0;
+  }
+  ~Queue(){
+    NodeQueue<Type> *temp = front;
+    while(temp != nullptr){
+      NodeQueue<Type> *next = temp->next;
+      delete temp;
+      temp = next;
+    }
+  }
+};
+struct NodeBST {
   string name;
   int score;
-  Node *left;
-  Node *right;
-  Node(string n, int s) : name(n), score(s), left(nullptr), right(nullptr) {}
+  NodeBST *left;
+  NodeBST *right;
+  NodeBST(string n, int s) : name(n), score(s), left(nullptr), right(nullptr) {}
 };
-Node *insert(Node *root, string name, int score) {
+NodeBST *insert(NodeBST *root, string name, int score) {
   if (root == nullptr) {
-    return new Node(name, score);
+    return new NodeBST(name, score);
   }
 
   if (score < root->score) {
@@ -46,7 +148,7 @@ Node *insert(Node *root, string name, int score) {
 
   return root;
 }
-void inOrderTraversal(Node *root) {
+void inOrderTraversal(NodeBST *root) {
   if (root != nullptr) {
     inOrderTraversal(root->left);
     cout << root->name << "\t" << root->score << endl;
@@ -62,6 +164,9 @@ bool isPlaceTakenByCoins(int position, const list<Coins> &items) {
   }
   return false;
 }
+Queue<Coins> collectedCoins;
+Queue<Obstacle> collectedObstacles;
+Queue<PowerUp> collectedPowerUps;
 bool isPlaceTakenByObstacles(int position, const list<Obstacle> &items) {
   for (const auto &item : items) {
     if (item.obstaclePlace == position) { // Adjust the comparison based on the
@@ -159,7 +264,7 @@ public:
     vector<int> path;
 
     // Create a queue for BFS
-    queue<int> queue;
+    Queue<int> queue;
 
     // Create a vector to store the parent of each vertex
     vector<int> parent(V, -1);
@@ -172,9 +277,9 @@ public:
     queue.push(source);
 
     // Run BFS until the queue is empty
-    while (!queue.empty()) {
+    while (!queue.isEmpty()) {
       // Dequeue a vertex from the queue
-      int vertex = queue.front();
+      int vertex = queue.getFront();
       queue.pop();
 
       // Get all adjacent vertices of the dequeued vertex vertex

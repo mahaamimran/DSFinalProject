@@ -89,7 +89,7 @@ void viewScoreBoard() {
                     "semester/DS/i222733_F_FinalProject/scoreBoard.csv";
   ifstream fin(filePath);
   string line;
-  Node *root = nullptr;
+  NodeBST *root = nullptr;
 
   while (getline(fin, line)) {
     // Find the position of the comma to separate name and score
