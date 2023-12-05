@@ -8,6 +8,7 @@
 #include <random>
 #include <unistd.h>
 #include <vector>
+#include <set>
 
 using namespace std;
 struct Obstacle {
@@ -17,7 +18,6 @@ struct Obstacle {
 struct Coins {
   char symbol;
   int coinPlace;
-  int scoreValue;
 };
 struct PowerUp {
   char symbol;
@@ -68,9 +68,9 @@ bool isPlaceTakenByObstacles(int position, const list<Obstacle> &items) {
   }
   return false;
 }
-bool isPlaceTakenByPowerUps(int position, const list<PowerUp> &items) {
-  for (const auto &item : items) {
-    if (item.powerUpPlace == position) { // Adjust the comparison based on the
+bool isPlaceTakenByPowerUps(int position, list<PowerUp>& powerUps){
+  for (const auto &powerUps : powerUps) {
+    if (powerUps.powerUpPlace == position) { // Adjust the comparison based on the
                                          // actual structure of your items
       return true;
     }
@@ -111,14 +111,14 @@ public:
   }
 
   vector<int> dijkstrasAlgorithm(int source, int destination) {
-    std::vector<int> dist(V, INT_MAX); // Initialize distances to infinity
-    std::vector<int> parent(V, -1);    // Initialize parent pointers
-    std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int> >,
-                        std::greater<std::pair<int, int> > >
+    vector<int> dist(V, INT_MAX); // Initialize distances to infinity
+    vector<int> parent(V, -1);    // Initialize parent pointers
+    priority_queue<pair<int, int>, vector<pair<int, int> >,
+                        greater<pair<int, int> > >
         pq;
 
     dist[source] = 0; // Distance from source to source is 0
-    pq.push(std::make_pair(0, source));
+    pq.push(make_pair(0, source));
 
     while (!pq.empty()) {
       int u = pq.top().second;
@@ -131,19 +131,19 @@ public:
         if (dist[u] + weight < dist[v]) {
           dist[v] = dist[u] + weight;
           parent[v] = u;
-          pq.push(std::make_pair(dist[v], v));
+          pq.push(make_pair(dist[v], v));
         }
       }
     }
 
     // Reconstruct the path from source to destination
-    std::vector<int> path;
+    vector<int> path;
     int vertex = destination;
     while (vertex != -1) {
       path.push_back(vertex);
       vertex = parent[vertex];
     }
-    std::reverse(path.begin(), path.end());
+    reverse(path.begin(), path.end());
 
     return path;
   }
@@ -205,14 +205,16 @@ public:
 class Car {
   char symbol;
   int carPlace;
-
+  int stepsTaken;
 public:
-  Car() : symbol('C'), carPlace(0) {}
-  Car(char s, int c) : symbol(s), carPlace(c) {}
+  Car() : symbol('C'), carPlace(0), stepsTaken(0) {}
+  Car(char s, int c, int st) : symbol(s), carPlace(c), stepsTaken(st) {}
   void setCarSymbol(char s) { symbol = s; }
   char getCarSymbol() { return symbol; }
   int getCarPlace() { return carPlace; }
   void setCarPlace(int c) { carPlace = c; }
+  int getStepsTaken() { return stepsTaken; }
+  void setStepsTaken(int st) { stepsTaken = st; }
   void checkForItems(Graph &g, int carPlace, list<Obstacle> &obstacles,
                      list<Coins> &coins, list<PowerUp> &powerUps, int &score) {}
   void moveUp(Graph &g, int rows, int cols, int &score,
@@ -320,15 +322,32 @@ void checkForCollision(Graph &g, int newCarPlace, int &score,
         cout << "You hit an obstacle! -10 to score" << endl;
         score -= 10;
     }
-
-    // Add any other checks for collision with coins or power-ups if needed
-    // ...
-
-    // Update score based on collected coins or power-ups
-    // ...
-
-    // Remove collected coins or power-ups from the respective lists
-    // ...
+    else if(isPlaceTakenByCoins(newCarPlace, coins)){
+      // coinscorevalue taken from coins list
+        cout << "You collected a coin! +10 to score" << endl;
+        score += 10;
+        // remove the coin from the list
+        for (auto it = coins.begin(); it != coins.end(); it++) {
+            if (it->coinPlace == newCarPlace) {
+                coins.erase(it);
+                break;
+            }
+        }
+    }
+    else if(isPlaceTakenByPowerUps(newCarPlace, powerUps)){
+        cout << "You collected a power up! +20 to score" << endl;
+        score += 20;
+        // remove the power up from the list
+        for (auto it = powerUps.begin(); it != powerUps.end(); it++) {
+            if (it->powerUpPlace == newCarPlace) {
+                powerUps.erase(it);
+                break;
+            }
+        }
+    }
+    else{
+        cout << "You moved to a new place" << endl;
+    }
 }
 
   void checkForLastVertex(Graph &g, int carPlace, int &score) {
@@ -342,47 +361,65 @@ void checkForCollision(Graph &g, int newCarPlace, int &score,
     }
   }
 };
-void generateCoins(Graph &g, int rows, int columns, list<Coins> &coins) {
-  srand(int(time(0)));
-  int totalVertices = rows * columns;
-  int numCoins = rand() % (totalVertices / 2);
-  for (int i = 0; i < numCoins; i++) {
-    int coinPlace = rand() % totalVertices;
-    int scoreValue = rand() % 10 + 1;
+void generateItems(Graph& g, int rows, int cols, list<Coins>& coins, list<Obstacle>& obstacles, list<PowerUp>& powerups) {
+
+  srand(time(0));
+
+  int numCoins = 4;
+  int numObstacles = 4; 
+  int numPowerups = 4;
+
+  int totalLocations = rows * cols;
+
+  // Track occupied locations
+  set<int> occupied;  
+
+  // Generate coins
+  for(int i=0; i<numCoins; i++) {
+    int loc;
+    do {
+      loc = rand() % totalLocations; 
+    } while(occupied.count(loc));
+    
+    occupied.insert(loc);
+
     Coins coin;
-    coin.coinPlace = coinPlace;
-    coin.scoreValue = scoreValue;
-    coin.symbol = 'O';
+    coin.coinPlace = loc;
+    
     coins.push_back(coin);
   }
-}
-void generateObstacles(Graph &g, int rows, int columns,
-                       list<Obstacle> &obstacles) {
-  srand(int(time(0)));
-  int totalVertices = rows * columns;
-  int numObstacles = rand() % (totalVertices / 2);
-  for (int i = 0; i < numObstacles; i++) {
-    int obstaclePlace = rand() % totalVertices;
+
+  // Generate obstacles
+  for(int i=0; i<numObstacles; i++) {
+    int loc;
+    do {
+      loc = rand() % totalLocations;
+    } while(occupied.count(loc));  
+
+    occupied.insert(loc);
+
     Obstacle obstacle;
-    obstacle.obstaclePlace = obstaclePlace;
-    obstacle.symbol = 'B';
+    obstacle.obstaclePlace = loc;
+
     obstacles.push_back(obstacle);
   }
-}
-void generatePowerUps(Graph &g, int rows, int columns,
-                      list<PowerUp> &powerups) {
-  srand(int(time(0)));
-  int totalVertices = rows * columns;
-  int numPowerUps = 4;
-  for (int i = 0; i < numPowerUps; i++) {
-    int powerUpPlace = rand() % totalVertices;
+
+  // Generate powerups  
+  for(int i=0; i<numPowerups; i++) {
+    int loc;
+    do {
+      loc = rand() % totalLocations;
+    } while(occupied.count(loc));
+
+    occupied.insert(loc);
+
     PowerUp powerup;
-    powerup.powerUpPlace = powerUpPlace;
-    powerup.symbol = 'P';
+    powerup.powerUpPlace = loc;
+
     powerups.push_back(powerup);
   }
-}
 
+}
 void display(Graph &g, int rows, int columns, Car &car, list<Coins> &coins,
              list<Obstacle> &obstacles, list<PowerUp> &powerUps, int score) {
   for (int i = 0; i < rows; i++) {

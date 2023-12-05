@@ -93,9 +93,7 @@ int main() {
   generateMap(g, rows, columns);
 
   // generating coins obstacles and powerups
-  generateCoins(g, rows, columns, coins);
-  generateObstacles(g, rows, columns, obstacles);
-  generatePowerUps(g, rows, columns, powerups);
+  generateItems(g, rows, columns, coins, obstacles, powerups);
 
   // the game has two modes, manual and auto
   // ask user to choose mode
