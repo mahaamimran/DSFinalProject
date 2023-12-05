@@ -22,24 +22,16 @@ void manualMode(Graph &g, int rows, int columns, Car &car, int &score,
   while (true) {
     // moving car
     cin >> c;
-    if (c == 'a') {
-      car.moveCar(g, 'a', rows, columns, score, obstacles, coins, powerups);
-      display(g, rows, columns, car, coins, obstacles, powerups, score);
-    } else if (c == 'w') {
-      car.moveCar(g, 'w', rows, columns, score, obstacles, coins, powerups);
-      display(g, rows, columns, car, coins, obstacles, powerups, score);
-    } else if (c == 's') {
-      car.moveCar(g, 's', rows, columns, score, obstacles, coins, powerups);
-      display(g, rows, columns, car, coins, obstacles, powerups, score);
-    } else if (c == 'd') {
-      car.moveCar(g, 'd', rows, columns, score, obstacles, coins, powerups);
-      display(g, rows, columns, car, coins, obstacles, powerups, score);
+    if (c == 'a' || c == 'w' || c == 's' || c == 'd') {
+        car.moveCar(g, c, rows, columns, score, obstacles, coins, powerups);
+        display(g, rows, columns, car, coins, obstacles, powerups, score);
     } else if (c == 'q') {
-      break;
+        break;
     } else {
-      cout << "Invalid input" << endl;
+        cout << "Invalid input" << endl;
     }
-  }
+}
+
 }
 
 void autoMode(Graph &g, int rows, int columns, Car &car,

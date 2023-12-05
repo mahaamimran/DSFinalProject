@@ -50,6 +50,33 @@ void inOrderTraversal(Node *root) {
     inOrderTraversal(root->right);
   }
 }
+bool isPlaceTakenByCoins(int position, const list<Coins> &items) {
+  for (const auto &item : items) {
+    if (item.coinPlace == position) { // Adjust the comparison based on the
+                                      // actual structure of your items
+      return true;
+    }
+  }
+  return false;
+}
+bool isPlaceTakenByObstacles(int position, const list<Obstacle> &items) {
+  for (const auto &item : items) {
+    if (item.obstaclePlace == position) { // Adjust the comparison based on the
+                                          // actual structure of your items
+      return true;
+    }
+  }
+  return false;
+}
+bool isPlaceTakenByPowerUps(int position, const list<PowerUp> &items) {
+  for (const auto &item : items) {
+    if (item.powerUpPlace == position) { // Adjust the comparison based on the
+                                         // actual structure of your items
+      return true;
+    }
+  }
+  return false;
+}
 class Graph {
   int V;
   list<pair<int, int> > *adjList;
@@ -189,91 +216,120 @@ public:
   void checkForItems(Graph &g, int carPlace, list<Obstacle> &obstacles,
                      list<Coins> &coins, list<PowerUp> &powerUps, int &score) {}
   void moveUp(Graph &g, int rows, int cols, int &score,
+            list<Obstacle> &obstacles, list<Coins> &coins,
+            list<PowerUp> &powerUps) {
+    system("clear");
+    int newCarPlace = carPlace - cols;
+
+    if (newCarPlace < 0) {
+        cout << "Can't move up" << endl;
+    } else {
+        if (g.doesEdgeExist(carPlace, newCarPlace)) {
+            checkForCollision(g, newCarPlace, score, obstacles, coins, powerUps);
+            carPlace = newCarPlace;
+            checkForLastVertex(g, carPlace, score);
+        } else {
+            cout << "Can't move up" << endl;
+        }
+    }
+}
+
+void moveDown(Graph &g, int rows, int cols, int &score,
               list<Obstacle> &obstacles, list<Coins> &coins,
               list<PowerUp> &powerUps) {
     system("clear");
-    if (carPlace - cols < 0) {
-      cout << "Can't move up" << endl;
-    } else {
-      if (g.doesEdgeExist(carPlace, carPlace - cols)) {
-        carPlace -= cols;
-        // checkForItems(g, obstacles, coins, score);
-        checkForLastVertex(g, carPlace, score);
-      } else {
-        cout << "Can't move up" << endl;
-      }
-    }
-  }
-  void moveDown(Graph &g, int rows, int cols, int &score,
-                list<Obstacle> &obstacles, list<Coins> &coins,
-                list<PowerUp> &powerUps) {
-    system("clear");
-    if (carPlace + cols >= rows * cols) {
-      cout << "Can't move down" << endl;
-    } else {
-      if (g.doesEdgeExist(carPlace, carPlace + cols)) {
-        carPlace += cols;
-        // checkForItems(g, obstacles, coins, score);
-        checkForLastVertex(g, carPlace, score);
-      } else {
+    int newCarPlace = carPlace + cols;
+
+    if (newCarPlace >= rows * cols) {
         cout << "Can't move down" << endl;
-      }
+    } else {
+        if (g.doesEdgeExist(carPlace, newCarPlace)) {
+            checkForCollision(g, newCarPlace, score, obstacles, coins, powerUps);
+            carPlace = newCarPlace;
+            checkForLastVertex(g, carPlace, score);
+        } else {
+            cout << "Can't move down" << endl;
+        }
     }
-  }
+}
 
-  void moveLeft(Graph &g, int rows, int cols, int &score,
-                list<Obstacle> &obstacles, list<Coins> &coins,
-                list<PowerUp> &powerUps) {
+void moveLeft(Graph &g, int rows, int cols, int &score,
+              list<Obstacle> &obstacles, list<Coins> &coins,
+              list<PowerUp> &powerUps) {
     system("clear");
+    int newCarPlace = carPlace - 1;
+
     if (carPlace % cols == 0) {
-      cout << "Can't move left" << endl;
-    } else {
-      if (g.doesEdgeExist(carPlace, carPlace - 1)) {
-        carPlace--;
-        checkForItems(g, carPlace, obstacles, coins, powerUps, score);
-        checkForLastVertex(g, carPlace, score);
-      } else {
         cout << "Can't move left" << endl;
-      }
-    }
-  }
-
-  void moveRight(Graph &g, int rows, int cols, int &score,
-                 list<Obstacle> &obstacles, list<Coins> &coins,
-                 list<PowerUp> &powerUps) {
-    system("clear");
-    if (carPlace % cols == cols - 1) {
-      cout << "Can't move right" << endl;
     } else {
-      if (g.doesEdgeExist(carPlace, carPlace + 1)) {
-        carPlace++;
-        checkForItems(g, carPlace, obstacles, coins, powerUps, score);
-        checkForLastVertex(g, carPlace, score);
-      } else {
-        cout << "Can't move right" << endl;
-      }
+        if (g.doesEdgeExist(carPlace, newCarPlace)) {
+            checkForCollision(g, newCarPlace, score, obstacles, coins, powerUps);
+            carPlace = newCarPlace;
+            checkForLastVertex(g, carPlace, score);
+        } else {
+            cout << "Can't move left" << endl;
+        }
     }
-  }
-  void moveCar(Graph &g, char direction, int rows, int cols, int &score,
+}
+
+void moveRight(Graph &g, int rows, int cols, int &score,
                list<Obstacle> &obstacles, list<Coins> &coins,
                list<PowerUp> &powerUps) {
-    switch (direction) {
-    case 'a':
-      moveLeft(g, rows, cols, score, obstacles, coins, powerUps);
-      break;
-    case 'w':
-      moveUp(g, rows, cols, score, obstacles, coins, powerUps);
-      break;
-    case 's':
-      moveDown(g, rows, cols, score, obstacles, coins, powerUps);
-      break;
-    case 'd':
-      moveRight(g, rows, cols, score, obstacles, coins, powerUps);
-      break;
-    default:
-      cout << "Invalid input" << endl;
+    system("clear");
+    int newCarPlace = carPlace + 1;
+
+    if (newCarPlace % cols == 0) {
+        cout << "Can't move right" << endl;
+    } else {
+        if (g.doesEdgeExist(carPlace, newCarPlace)) {
+            checkForCollision(g, newCarPlace, score, obstacles, coins, powerUps);
+            carPlace = newCarPlace;
+            checkForLastVertex(g, carPlace, score);
+        } else {
+            cout << "Can't move right" << endl;
+        }
     }
-  }
+}
+void moveCar(Graph &g, char direction, int rows, int cols, int &score,
+              list<Obstacle> &obstacles, list<Coins> &coins,
+              list<PowerUp> &powerUps) {
+    switch (direction) {
+        case 'a':
+            moveLeft(g, rows, cols, score, obstacles, coins, powerUps);
+            break;
+        case 'w':
+            moveUp(g, rows, cols, score, obstacles, coins, powerUps);
+            break;
+        case 's':
+            moveDown(g, rows, cols, score, obstacles, coins, powerUps);
+            break;
+        case 'd':
+            moveRight(g, rows, cols, score, obstacles, coins, powerUps);
+            break;
+        default:
+            cout << "Invalid input" << endl;
+    }
+}
+
+
+void checkForCollision(Graph &g, int newCarPlace, int &score,
+                       list<Obstacle> &obstacles, list<Coins> &coins,
+                       list<PowerUp> &powerUps) {
+    // Check for collision with obstacles
+    if (isPlaceTakenByObstacles(newCarPlace, obstacles)) {
+        cout << "You hit an obstacle! -10 to score" << endl;
+        score -= 10;
+    }
+
+    // Add any other checks for collision with coins or power-ups if needed
+    // ...
+
+    // Update score based on collected coins or power-ups
+    // ...
+
+    // Remove collected coins or power-ups from the respective lists
+    // ...
+}
 
   void checkForLastVertex(Graph &g, int carPlace, int &score) {
     int lastVertex = g.getV() - 1;
@@ -326,33 +382,7 @@ void generatePowerUps(Graph &g, int rows, int columns,
     powerups.push_back(powerup);
   }
 }
-bool isPlaceTakenByCoins(int position, const list<Coins> &items) {
-  for (const auto &item : items) {
-    if (item.coinPlace == position) { // Adjust the comparison based on the
-                                      // actual structure of your items
-      return true;
-    }
-  }
-  return false;
-}
-bool isPlaceTakenByObstacles(int position, const list<Obstacle> &items) {
-  for (const auto &item : items) {
-    if (item.obstaclePlace == position) { // Adjust the comparison based on the
-                                          // actual structure of your items
-      return true;
-    }
-  }
-  return false;
-}
-bool isPlaceTakenByPowerUps(int position, const list<PowerUp> &items) {
-  for (const auto &item : items) {
-    if (item.powerUpPlace == position) { // Adjust the comparison based on the
-                                         // actual structure of your items
-      return true;
-    }
-  }
-  return false;
-}
+
 void display(Graph &g, int rows, int columns, Car &car, list<Coins> &coins,
              list<Obstacle> &obstacles, list<PowerUp> &powerUps, int score) {
   for (int i = 0; i < rows; i++) {
