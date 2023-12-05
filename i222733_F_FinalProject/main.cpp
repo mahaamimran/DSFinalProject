@@ -85,7 +85,7 @@ int main(){
   char c;
   int score=0;
   int rows=6,columns=6;
-  int vertices=rows* columns;
+  int vertices=rows*columns;
   int carPlace=0;
   Graph g(vertices);
 
@@ -96,6 +96,7 @@ int main(){
   // generating coins obstacles and powerups
   generateItems(g,rows,columns,coins,obstacles,powerups);
 
+  system("clear");
   cout<<"MAIN MENU\n";
   cout<<"--------------\n";
   cout<<"Which mode would you like to select?\n1. Manual\n2. Auto\n--------------\n3. View Scoreboard\n";
