@@ -16,14 +16,8 @@ void manualMode(Graph &g, int rows, int columns, Car &car, int &score,
   char c;
   // displaying map
   display(g, rows, columns, car, coins, obstacles, powerups, score);
-  cout << "Press a, w, s, d to move the car\nPress q to quit" << endl;
+  cout << "Press A, W, S or D to move the car\nPress Q to quit" << endl;
   while (true) {
-    // help for user
-    cout << "Car: C\n";
-    cout << "Powerups: P (20 points)\n";
-    cout << "Coins: 0 (10 points)\n";
-    cout << "Obstacles: B (-10 points)\n";
-    cout << "Get to the end of the map to win! (F)\n";
     car.displaySteps();
     cin >> c;
     if (c == 'a' || c == 'w' || c == 's' || c == 'd') {
@@ -36,43 +30,41 @@ void manualMode(Graph &g, int rows, int columns, Car &car, int &score,
     }
   }
 }
-void autoMode(Graph &g, int rows, int columns, Car &car, list<Obstacle> &obstacles, int &score, list<Coins> &coins, list<PowerUp>& powerUps, vector<int> path) {
- // system("clear");
-  
-  // Iterate through each vertex in the path
-  for (int i = 0; i < path.size() - 1; i++) {
-    // Move the car to the next vertex in the path
-    int currentVertex = path[i];
-    int nextVertex = path[i + 1];
+void autoMode(Graph &g, int rows, int columns, Car &car, list<Obstacle> &obstacles, int &score, list<Coins> &coins, list<PowerUp>& powerUps, vector<int> path){
+    // Print path
+    cout << "Path: ";
+    for (int i = 0; i < path.size(); i++) {
+        cout << path[i] << " ";
+    }
+    cout << endl;
 
-    // Determine the direction of movement
-    char direction;
-    if (nextVertex == currentVertex - 1) {
-      direction = 'a';
-    } else if (nextVertex == currentVertex + 1) {
-      direction = 'd';
-    } else if (nextVertex == currentVertex - columns) {
-      direction = 'w';
-    } else if (nextVertex == currentVertex + columns) {
-      direction = 's';
-    } else {
-      // Invalid path, skip this move
-      continue;
+    // Iterate over the path
+    for (int i = 0; i < path.size() - 1; i++) {
+        int currentVertex = path[i];
+        int nextVertex = path[i + 1];
+
+        // Find the direction of the next vertex
+        char direction = g.findDirection(currentVertex, nextVertex, rows, columns);
+
+        // Display intermediate state
+        car.moveCar(g, direction, rows, columns, score, obstacles, coins, powerUps);
+        display(g, rows, columns, car, coins, obstacles, powerUps, score);
+
+        // Move the car based on the direction
+
+        // Check for collision or other events
+        // Note: Implement collision and event checks here if needed
+
+        //display(g, rows, columns, car, coins, obstacles, powerUps, score);
+        // Introduce a delay for visibility (adjust as needed)
+      sleep(1); 
     }
 
-    // Move the car in the determined direction
-    car.moveCar(g, direction, rows, columns, score, obstacles, coins, powerUps);
+    // Display the final state after reaching the destination
 
-    // Update the display to show the current state
-    display(g, rows, columns, car, coins, obstacles, powerUps, score);
-
-    // Introduce a delay of one second to simulate real-time movement
-    sleep(1);
-  }
-
-  // Optional: Display the final score after reaching the destination
-  cout << "Game Over! Your score is: " << score << endl;
 }
+
+
 
 void writeToFile(string name, int score) {
   fstream fout;
@@ -135,8 +127,8 @@ int main() {
   Graph g(vertices);
 
   // generating map
-  vector<int> path = g.dijkstrasAlgorithm(0, vertices - 1);
   generateMap(g, rows, columns);
+  vector<int> path = g.dijkstrasAlgorithm(0, vertices - 1);
 
   // generating coins obstacles and powerups
   generateItems(g, rows, columns, coins, obstacles, powerups);
@@ -159,9 +151,9 @@ int main() {
     cout << "Everything you bumped into:\n";
     displayAllQueues();
   } else if (mode == 2) {
-    system("clear");
+    //system("clear");
     string name="auto mode";
-    autoMode(g,rows,columns,car, obstacles, score, coins, powerups, path);
+    autoMode(g, rows, columns, car, obstacles, score, coins, powerups, path);
     writeToFile(name, score);
     cout << "Game Over " << name << "! Your score is: " << score << endl;
     cout << "Everything you bumped into:\n";

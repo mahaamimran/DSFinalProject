@@ -240,7 +240,22 @@ public:
     }
     return 0;
   }
-
+  char findDirection(int currentVertex,int nextVertex,int rows,int columns){
+    char direction;
+    if(nextVertex == currentVertex + 1){
+      direction = 'd';
+    }
+    else if(nextVertex == currentVertex - 1){
+      direction = 'a';
+    }
+    else if(nextVertex == currentVertex + columns){
+      direction = 's';
+    }
+    else if(nextVertex == currentVertex - columns){
+      direction = 'w';
+    }
+    return direction;
+  }
   vector<int> dijkstrasAlgorithm(int source, int destination) {
     vector<int> dist(V, INT_MAX); // Initialize distances to infinity
     vector<int> parent(V, -1);    // Initialize parent pointers
@@ -502,66 +517,66 @@ void checkForCollision(Graph &g, int newCarPlace, int &score,
     cout << "Number of steps taken: " << stepsTaken << endl;
   }
 };
-void generateItems(Graph& g, int rows, int cols, list<Coins>& coins, list<Obstacle>& obstacles, list<PowerUp>& powerups) {
+void generateItems(Graph &g, int rows, int cols, list<Coins> &coins, list<Obstacle> &obstacles, list<PowerUp> &powerups) {
 
-  srand(time(0));
+    srand(time(0));
 
-  int numCoins = 4;
-  int numObstacles = 4; 
-  int numPowerups = 4;
+    int numCoins = 4;
+    int numObstacles = 4;
+    int numPowerups = 4;
 
-  int totalLocations = rows * cols;
+    int totalLocations = rows * cols;
 
-  // Track occupied locations
-  set<int> occupied;  
+    // Track occupied locations
+    set<int> occupied;
 
-  // Generate coins
-  for(int i=0; i<numCoins; i++) {
-    int loc;
-    do {
-      loc = rand() % totalLocations; 
-    } while(occupied.count(loc));
-    
-    occupied.insert(loc);
+    // Generate coins
+    for (int i = 0; i < numCoins; i++) {
+        int loc;
+        do {
+            loc = rand() % totalLocations;
+        } while (occupied.count(loc) || loc == 0 || loc == totalLocations - 1);
 
-    Coins coin;
-    coin.coinPlace = loc;
-    coin.symbol = 'O';
-    coins.push_back(coin);
-  }
+        occupied.insert(loc);
 
-  // Generate obstacles
-  for(int i=0; i<numObstacles; i++) {
-    int loc;
-    do {
-      loc = rand() % totalLocations;
-    } while(occupied.count(loc));  
+        Coins coin;
+        coin.coinPlace = loc;
+        coin.symbol = 'O';
+        coins.push_back(coin);
+    }
 
-    occupied.insert(loc);
+    // Generate obstacles
+    for (int i = 0; i < numObstacles; i++) {
+        int loc;
+        do {
+            loc = rand() % totalLocations;
+        } while (occupied.count(loc) || loc == 0 || loc == totalLocations - 1);
 
-    Obstacle obstacle;
-    obstacle.obstaclePlace = loc;
-    obstacle.symbol = 'B';
-    obstacles.push_back(obstacle);
-  }
+        occupied.insert(loc);
 
-  // Generate powerups  
-  for(int i=0; i<numPowerups; i++) {
-    int loc;
-    do {
-      loc = rand() % totalLocations;
-    } while(occupied.count(loc));
+        Obstacle obstacle;
+        obstacle.obstaclePlace = loc;
+        obstacle.symbol = 'B';
+        obstacles.push_back(obstacle);
+    }
 
-    occupied.insert(loc);
+    // Generate powerups
+    for (int i = 0; i < numPowerups; i++) {
+        int loc;
+        do {
+            loc = rand() % totalLocations;
+        } while (occupied.count(loc) || loc == 0 || loc == totalLocations - 1);
 
-    PowerUp powerup;
-    powerup.powerUpPlace = loc;
-    powerup.symbol = 'P';
+        occupied.insert(loc);
 
-    powerups.push_back(powerup);
-  }
+        PowerUp powerup;
+        powerup.powerUpPlace = loc;
+        powerup.symbol = 'P';
 
+        powerups.push_back(powerup);
+    }
 }
+
 void display(Graph &g, int rows, int columns, Car &car, list<Coins> &coins,
              list<Obstacle> &obstacles, list<PowerUp> &powerUps, int score) {
   for (int i = 0; i < rows; i++) {
