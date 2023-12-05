@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <iomanip>
 using namespace std;
+// manual mode
 void manualMode(Graph&g,int rows,int columns,Car&car,int&score,list<Obstacle>&obstacles,list<Coins>&coins,list<PowerUp>&powerups){
   char c;
   display(g,rows,columns,car,coins,obstacles,powerups,score);
@@ -21,6 +22,7 @@ void manualMode(Graph&g,int rows,int columns,Car&car,int&score,list<Obstacle>&ob
     else cout<<"Invalid input\n";
   }
 }
+// auto mode
 void autoMode(Graph&g,int rows,int columns,Car&car,list<Obstacle>&obstacles,int&score,list<Coins>&coins,list<PowerUp>&powerUps,vector<int>path){
     cout<<"Shortest Path using dijkstra's algorthm: ";
     for(int i=0; i < path.size(); i++)cout<<path[i]<<" ";
@@ -38,6 +40,7 @@ void autoMode(Graph&g,int rows,int columns,Car&car,list<Obstacle>&obstacles,int&
       sleep(1); 
     }
 }
+// writing to csv file
 void writeToFile(string name,int score){
   fstream fout;
   string filePath="/Users/mahamimran/teesra semester/DS/i222733_F_FinalProject/scoreBoard.csv";
@@ -45,6 +48,7 @@ void writeToFile(string name,int score){
   fout<<name<<","<<score<<endl;
   fout.close();
 }
+// displaying the scoreboard sorting with bst
 void viewScoreBoard(){
   // read the scores from the csv and insert them into bst
   string filePath="/Users/mahamimran/teesra semester/DS/i222733_F_FinalProject/scoreBoard.csv";
@@ -65,6 +69,7 @@ void viewScoreBoard(){
   inOrderTraversal(root);
   fin.close();
 }
+// displaying all the queues of collected items at the end of the game
 void displayAllQueues(){
   // displaying all the queues at the end of the game
   cout<<"Coins: ";
@@ -75,6 +80,7 @@ void displayAllQueues(){
   collectedPowerUps.display();
   cout<<endl;
 }
+// main function
 int main(){
   Car car;
   // initial obstacles to put in graph
@@ -84,7 +90,7 @@ int main(){
 
   char c;
   int score=0;
-  int rows=6,columns=6;
+  int rows=10,columns=10;
   int vertices=rows*columns;
   int carPlace=0;
   Graph g(vertices);
@@ -96,6 +102,7 @@ int main(){
   // generating coins obstacles and powerups
   generateItems(g,rows,columns,coins,obstacles,powerups);
 
+  // displaying menu
   system("clear");
   cout<<"MAIN MENU\n";
   cout<<"--------------\n";
@@ -110,6 +117,7 @@ int main(){
     manualMode(g,rows,columns,car,score,obstacles,coins,powerups);
     writeToFile(name,score);
     cout<<"Game Over "<<name<<"! Your score is: "<<score<<endl;
+    cout<<"You could have finished the game in "<<path.size()<<" steps\n";
     cout<<"Everything you collected\n";
     displayAllQueues();
   } 
@@ -124,6 +132,6 @@ int main(){
   } 
   else if(mode==3)viewScoreBoard();
   else cout<<"Invalid input\n";
-  
+
   return 0;
 }

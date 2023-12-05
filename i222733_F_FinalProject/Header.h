@@ -110,7 +110,7 @@ public:
   }
   void pop(){
     if(front==nullptr){
-      cout<<"Queue is empty"<<endl;
+      cout<<"Queue is empty\n";
     } 
     else{
       NodeQueue<Type>*temp=front;
@@ -311,7 +311,7 @@ public:
     system("clear");
     int newCarPlace=carPlace-cols;
     if(newCarPlace<0){
-      cout<<"Can't move up"<<endl;
+      cout<<"Can't move up\n";
     } 
     else{
       if(g.doesEdgeExist(carPlace,newCarPlace)){
@@ -320,14 +320,14 @@ public:
         checkForLastVertex(g,carPlace,score);
         stepsTaken++;
       } else{
-        cout<<"Can't move up"<<endl;
+        cout<<"Can't move up\n";
       }
     }
   }
   void moveDown(Graph&g,int rows,int cols,int&score,list<Obstacle>&obstacles,list<Coins>&coins,list<PowerUp>&powerUps){
     system("clear");
     int newCarPlace=carPlace+cols;
-    if(newCarPlace>=rows*cols)cout<<"Can't move down"<<endl;
+    if(newCarPlace>=rows*cols)cout<<"Can't move down\n";
     else{
       if(g.doesEdgeExist(carPlace,newCarPlace)){
         checkForCollision(g,newCarPlace,score,obstacles,coins,powerUps);
@@ -335,13 +335,13 @@ public:
         checkForLastVertex(g,carPlace,score);
         stepsTaken++;
       } 
-      else cout<<"Can't move down"<<endl;
+      else cout<<"Can't move down\n";
     }
   }
   void moveLeft(Graph&g,int rows,int cols,int&score,list<Obstacle>&obstacles,list<Coins>&coins,list<PowerUp>&powerUps){
     system("clear");
     int newCarPlace=carPlace-1;
-    if(carPlace%cols==0)cout<<"Can't move left"<<endl;
+    if(carPlace%cols==0)cout<<"Can't move left\n";
     else{
       if(g.doesEdgeExist(carPlace,newCarPlace)){
         checkForCollision(g,newCarPlace,score,obstacles,coins,powerUps);
@@ -349,13 +349,13 @@ public:
         checkForLastVertex(g,carPlace,score);
         stepsTaken++;
       } 
-      else cout<<"Can't move left"<<endl;
+      else cout<<"Can't move left\n";
     }
   }
   void moveRight(Graph&g,int rows,int cols,int&score,list<Obstacle>&obstacles,list<Coins>&coins,list<PowerUp>&powerUps){
     system("clear");
     int newCarPlace=carPlace+1;
-    if(newCarPlace%cols==0)cout<<"Can't move right"<<endl;
+    if(newCarPlace%cols==0)cout<<"Can't move right\n";
     else{
       if(g.doesEdgeExist(carPlace,newCarPlace)){
         checkForCollision(g,newCarPlace,score,obstacles,coins,powerUps);
@@ -363,7 +363,7 @@ public:
         checkForLastVertex(g,carPlace,score);
         stepsTaken++;
       } 
-      else cout<<"Can't move right"<<endl;
+      else cout<<"Can't move right\n";
     }
   }
   void moveCar(Graph&g,char direction,int rows,int cols,int&score,list<Obstacle>&obstacles,list<Coins>&coins,list<PowerUp>&powerUps){
@@ -381,15 +381,15 @@ public:
       moveRight(g,rows,cols,score,obstacles,coins,powerUps);
       break;
     default:
-      cout<<"Invalid input"<<endl;
+      cout<<"Invalid input\n";
     }
   }
   // to check if the car is colliding with an obstacle or collecting a coin or powerup
   // removes from list, add to queue
   void checkForCollision(Graph&g,int newCarPlace,int&score,list<Obstacle>&obstacles,list<Coins>&coins,list<PowerUp>&powerUps){
     if(isPlaceTakenByObstacles(newCarPlace,obstacles)){
-      cout<<"You hit an obstacle! -10 to score"<<endl;
-      score -= 10;
+      cout<<"You hit an obstacle! -10 to score\n";
+      score-=10;
       for(auto it=obstacles.begin(); it!=obstacles.end(); it++){
         if(it->obstaclePlace==newCarPlace){
           collectedObstacles.push(*it);
@@ -399,7 +399,7 @@ public:
       }
     } 
     else if(isPlaceTakenByCoins(newCarPlace,coins)){
-      cout<<"You collected a coin! +10 to score"<<endl;
+      cout<<"You collected a coin! +10 to score\n";
       score+=10;
       for(auto it=coins.begin(); it!=coins.end(); it++){
         if(it->coinPlace==newCarPlace){
@@ -410,7 +410,7 @@ public:
       }
     } 
     else if(isPlaceTakenByPowerUps(newCarPlace,powerUps)){
-      cout<<"You collected a powerup! +20 to score"<<endl;
+      cout<<"You collected a powerup! +20 to score\n";
       score+=20;
       for(auto it=powerUps.begin(); it!=powerUps.end(); it++){
         if(it->powerUpPlace==newCarPlace){
@@ -420,7 +420,7 @@ public:
         }
       }
     } 
-    else cout<<"Race Car Game"<<endl;
+    else cout<<"Race Car Game\n";
   }
   void checkForLastVertex(Graph&g,int carPlace,int&score){
     int lastVertex=g.getV()-1;
@@ -436,9 +436,9 @@ public:
 // generating coins, obstacles and powerups
 void generateItems(Graph&g,int rows,int cols,list<Coins>&coins,list<Obstacle>&obstacles,list<PowerUp>&powerups){
   srand(time(0));
-  int numCoins=5;
-  int numObstacles=4;
-  int numPowerups=5;
+  int numCoins=10;
+  int numObstacles=6;
+  int numPowerups=8;
   int totalLocations=rows*cols;
   set<int>occupied;
 
